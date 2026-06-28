@@ -165,18 +165,6 @@ cd backend
 uvicorn app.main:app --reload
 ```
 
-Backend:
-
-```
-http://localhost:8000
-```
-
-API Documentation:
-
-```
-http://localhost:8000/docs
-```
-
 ---
 
 ## Frontend
