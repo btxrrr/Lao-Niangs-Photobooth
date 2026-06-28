@@ -8,6 +8,7 @@ import ResetPassword  from "./pages/ResetPassword"
 import Photobooth     from "./pages/Photobooth"
 import Frames         from "./pages/Frames"
 import ProtectedRoute from "./components/ProtectedRoute"
+import GestureGif from "./pages/GestureGif"
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/dashboard"  element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/photobooth" element={<ProtectedRoute><Photobooth /></ProtectedRoute>} />
         <Route path="/frames"     element={<ProtectedRoute><Frames /></ProtectedRoute>} />
+        <Route path="/gesture-gif" element={<ProtectedRoute><GestureGif /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

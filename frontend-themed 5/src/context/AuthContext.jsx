@@ -31,6 +31,17 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      localStorage.removeItem("token")
+      setUser(null)
+      setLoading(false)
+    }
+
+    window.addEventListener("auth:expired", handleAuthExpired)
+    return () => window.removeEventListener("auth:expired", handleAuthExpired)
+  }, [])
+
   // Call this from your Login page
   const login = async (email, password) => {
     const res = await loginUser({ email, password })

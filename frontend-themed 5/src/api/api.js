@@ -8,7 +8,7 @@ import axios from "axios"
 // changes (e.g. when you deploy), you only change it in ONE place.
 // ─────────────────────────────────────────────────────────────
 
-const BASE_URL = "http://localhost:8000"
+export const BASE_URL = "http://localhost:8000"
 
 // Create an axios instance pointed at your backend
 const api = axios.create({
@@ -24,6 +24,17 @@ api.interceptors.request.use((config) => {
   }
   return config
 })
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("token")
+      window.dispatchEvent(new Event("auth:expired"))
+    }
+    return Promise.reject(error)
+  }
+)
 
 // ─────────────────────────────────────────────────────────────
 // Auth endpoints
@@ -80,3 +91,16 @@ export const getCaptureImageUrl = (id) =>
   `${BASE_URL}/captures/${id}/image`
 
 export default api
+
+// ─────────────────────────────────────────────────────────────
+// GIF stitch endpoint (backend: POST /clips/stitch)
+// clips: array of Blob (webm video)
+// returns: { gif_url: string }
+// ─────────────────────────────────────────────────────────────
+export const stitchClips = (clips) => {
+  const form = new FormData()
+  clips.forEach((blob, i) => form.append("clips", blob, `clip_${i}.webm`))
+  return api.post("/clips/stitch", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+}

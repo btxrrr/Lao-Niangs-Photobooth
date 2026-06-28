@@ -5,33 +5,26 @@ from fastapi.openapi.utils import get_openapi
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy import inspect, text
 
 from app.config import get_settings
 from app.database import Base, engine
-from app.routes import auth_routes, capture_routes
+from app.routes import auth_routes, capture_routes, gif_routes
 
 settings = get_settings()
 
-# ──────────────────────────────────────────────
-# Rate limiter
-# ──────────────────────────────────────────────
 limiter = Limiter(key_func=get_remote_address)
 
-# ──────────────────────────────────────────────
-# App
-# ──────────────────────────────────────────────
 app = FastAPI(
-    title="PhotoBooth API",
-    description="Backend for the Orbital 26 web-based photo booth application",
-    version="0.1.0",
+    title="Lao Niangs Photo Booth API",
+    description="Backend for the Orbital 26 Lao Niangs Photo Booth application",
+    version="0.2.0",
 )
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# ──────────────────────────────────────────────
-# CORS
-# ──────────────────────────────────────────────
+# ── CORS ──────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
@@ -40,33 +33,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ──────────────────────────────────────────────
-# Routers
-# ──────────────────────────────────────────────
+# ── Routers ───────────────────────────────────────────────────
 app.include_router(auth_routes.router)
 app.include_router(capture_routes.router)
+app.include_router(gif_routes.router)
 
-
-# ──────────────────────────────────────────────
-# Custom OpenAPI — adds a plain Bearer token box to Swagger UI
-# so you don't have to deal with the confusing OAuth2 form
-# ──────────────────────────────────────────────
+# ── Swagger: plain Bearer token input ─────────────────────────
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     schema = get_openapi(
-        title=app.title,
-        version=app.version,
-        description=app.description,
-        routes=app.routes,
+        title=app.title, version=app.version,
+        description=app.description, routes=app.routes,
     )
     schema.setdefault("components", {})
     schema["components"]["securitySchemes"] = {
         "BearerAuth": {
-            "type": "http",
-            "scheme": "bearer",
-            "bearerFormat": "JWT",
-            "description": "Paste your token from POST /auth/login (no 'Bearer' prefix needed)",
+            "type": "http", "scheme": "bearer", "bearerFormat": "JWT",
+            "description": "Paste token from POST /auth/login (no 'Bearer' prefix needed)",
         }
     }
     for path in schema.get("paths", {}).values():
@@ -76,32 +60,31 @@ def custom_openapi():
     app.openapi_schema = schema
     return schema
 
-
 app.openapi = custom_openapi
 
-
-# ──────────────────────────────────────────────
-# Startup — create DB tables
-# ──────────────────────────────────────────────
+# ── Startup ───────────────────────────────────────────────────
 @app.on_event("startup")
 def on_startup():
-    """Create all tables on startup (Milestone 1). Replace with Alembic in Milestone 2.
-    Skipped automatically when DATABASE_URL is a SQLite test DB (controlled by conftest)."""
+    """Create DB tables on startup. Skip for SQLite (test env)."""
     if "sqlite" not in settings.database_url:
         Base.metadata.create_all(bind=engine)
+        inspector = inspect(engine)
+        capture_columns = {column["name"] for column in inspector.get_columns("captures")}
+        if "media_type" not in capture_columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE captures ADD COLUMN media_type VARCHAR DEFAULT 'photo'")
+                )
+                connection.execute(
+                    text("UPDATE captures SET media_type = 'photo' WHERE media_type IS NULL")
+                )
 
-
-# ──────────────────────────────────────────────
-# Health check
-# ──────────────────────────────────────────────
+# ── Health check ──────────────────────────────────────────────
 @app.get("/health", tags=["health"])
 def health():
     return {"status": "ok", "version": app.version}
 
-
-# ──────────────────────────────────────────────
-# Global exception handler (don't leak internals)
-# ──────────────────────────────────────────────
+# ── Global error handler ──────────────────────────────────────
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     return JSONResponse(

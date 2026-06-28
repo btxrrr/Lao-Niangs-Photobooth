@@ -20,6 +20,9 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
+  const photoCount = captures.filter((capture) => capture.media_type !== "gif").length
+  const gifCount = captures.filter((capture) => capture.media_type === "gif").length
+
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this photo?")) return
     setDeleting(id)
@@ -76,15 +79,19 @@ export default function Dashboard() {
 
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "40px 24px" }}>
 
-        {/* Title + action buttons */}
+        {/* Title + action buttons — always visible */}
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 12 }}>
           <div>
             <h2 className="font-playfair" style={{ fontSize: 32, color: "white", marginBottom: 6 }}>Your Memories</h2>
             <p className="font-dm" style={{ color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
-              {captures.length === 0 ? "No photos yet" : `${captures.length} photo${captures.length !== 1 ? "s" : ""} saved`}
+              {captures.length === 0
+                ? "No memories yet"
+                : `${photoCount} photo${photoCount === 1 ? "" : "s"}${gifCount ? ` · ${gifCount} GIF${gifCount === 1 ? "" : "s"}` : ""} saved`}
             </p>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+
+          {/* Buttons always rendered */}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             {captures.length >= 2 && (
               <button
                 className="btn-secondary"
@@ -94,6 +101,13 @@ export default function Dashboard() {
                 <span style={{ fontSize: 16 }}>🎞️</span> Create Frame
               </button>
             )}
+            <button
+              className="btn-secondary"
+              onClick={() => navigate("/gesture-gif")}
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
+              <span style={{ fontSize: 16 }}>🎬</span> GIF Booth
+            </button>
             <button
               className="btn-primary"
               onClick={() => navigate("/photobooth")}
@@ -119,9 +133,9 @@ export default function Dashboard() {
         {!loading && captures.length === 0 && !error && (
           <div className="glass-card" style={{ textAlign: "center", padding: "60px 40px" }}>
             <div style={{ fontSize: 56, marginBottom: 16 }}>🎞️</div>
-            <h3 className="font-playfair" style={{ fontSize: 22, color: "var(--text)", marginBottom: 8 }}>No photos yet!</h3>
+            <h3 className="font-playfair" style={{ fontSize: 22, color: "var(--text)", marginBottom: 8 }}>No memories yet!</h3>
             <p className="font-dm" style={{ color: "var(--text-light)", marginBottom: 24, fontSize: 14 }}>
-              Head to the photo booth to take your first capture.
+              Head to the booth to take your first photo or GIF.
             </p>
             <button className="btn-primary" onClick={() => navigate("/photobooth")}>Open Photo Booth</button>
           </div>
@@ -142,7 +156,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Hint when user has photos but not enough for frames */}
         {!loading && captures.length === 1 && (
           <p className="font-dm" style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, textAlign: "center", marginTop: 24 }}>
             Take one more photo to unlock the Create Frame feature 🎞️
@@ -153,20 +166,23 @@ export default function Dashboard() {
   )
 }
 
-
 function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
   const date    = new Date(capture.created_at)
   const dateStr = date.toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })
+  const isGif   = capture.media_type === "gif"
 
   return (
     <div style={{ position: "relative" }}>
       <div className="tape" />
       <div className={`polaroid ${rotate > 0 ? "polaroid-2" : ""}`} style={{ "--rot": `${rotate}deg` }}>
-
         <div style={{ width: "100%", aspectRatio: "1", background: "var(--cream-dark)", borderRadius: 2, overflow: "hidden", marginBottom: 4 }}>
           <AuthImage captureId={capture.id} alt={capture.caption || "Photo"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          {isGif && (
+            <div style={{ position: "absolute", top: 10, left: 10, background: "rgba(61,52,80,0.85)", color: "white", borderRadius: 999, padding: "4px 8px", fontSize: 10, letterSpacing: "0.08em" }}>
+              GIF
+            </div>
+          )}
         </div>
-
         <div style={{ padding: "6px 4px 0" }}>
           <p className="font-script" style={{ fontSize: 15, color: "var(--text)", minHeight: 22, textAlign: "center" }}>
             {capture.caption || ""}
@@ -182,10 +198,9 @@ function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
         </div>
       </div>
 
-      {/* Download button */}
       <button
         onClick={() => onDownload(capture.id, capture.original_filename)}
-        title="Download photo"
+        title={isGif ? "Download GIF" : "Download photo"}
         style={{
           position: "absolute", bottom: -10, right: 42,
           background: "#7B9BB5", color: "white",
@@ -194,15 +209,12 @@ function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
           cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)", transition: "all 0.2s",
         }}
-      >
-        ⬇
-      </button>
+      >⬇</button>
 
-      {/* Delete button */}
       <button
         onClick={() => onDelete(capture.id)}
         disabled={isDeleting}
-        title="Delete photo"
+        title="Delete memory"
         style={{
           position: "absolute", bottom: -10, right: 8,
           background: isDeleting ? "#ccc" : "#F87171", color: "white",
@@ -212,9 +224,7 @@ function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
           display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)", transition: "all 0.2s",
         }}
-      >
-        {isDeleting ? "..." : "✕"}
-      </button>
+      >{isDeleting ? "..." : "✕"}</button>
     </div>
   )
 }

@@ -319,7 +319,7 @@ export default function Frames() {
               Choose a layout
             </h2>
             <p className="font-dm" style={{ color: "rgba(255,255,255,0.65)", marginBottom: 32, fontSize: 14 }}>
-              Pick how you want your photos arranged in the final frame.
+              Pick how you want your memories arranged in the final frame.
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
               {LAYOUTS.map((l) => (
@@ -338,7 +338,7 @@ export default function Frames() {
                     {l.label}
                   </p>
                   <p className="font-dm" style={{ fontSize: 13, color: "var(--text-light)" }}>
-                    {l.description} · {l.slots} photos
+                    {l.description} · {l.slots} memories
                   </p>
                 </button>
               ))}
@@ -366,7 +366,7 @@ export default function Frames() {
                 <div className="glass-card" style={{ padding: 28, textAlign: "center" }}>
                   <div style={{ fontSize: 40, marginBottom: 12 }}>👆</div>
                   <p className="font-dm" style={{ color: "var(--text-light)", fontSize: 14 }}>
-                    Tap any slot on the left to fill it with a photo.
+                    Tap any slot on the left to fill it with a memory.
                   </p>
                   <p className="font-dm" style={{ color: "var(--text-light)", fontSize: 13, marginTop: 8 }}>
                     {slots.filter(Boolean).length} / {layout.slots} filled
@@ -394,7 +394,7 @@ export default function Frames() {
                   </div>
 
                   <p className="font-dm" style={{ fontSize: 12, color: "var(--text-light)", marginBottom: 12 }}>
-                    Slot {activeSlot + 1} — pick a photo
+                    Slot {activeSlot + 1} — pick a memory
                   </p>
 
                   {galleryLoading && (
@@ -405,7 +405,7 @@ export default function Frames() {
 
                   {!galleryLoading && gallery.length === 0 && (
                     <p className="font-dm" style={{ color: "var(--text-light)", fontSize: 13, textAlign: "center", padding: 20 }}>
-                      No photos in gallery yet. Take one!
+                      No memories in gallery yet. Take one!
                     </p>
                   )}
 
@@ -548,7 +548,7 @@ export default function Frames() {
           <div style={{ display: "flex", gap: 32, flexWrap: "wrap", alignItems: "flex-start", justifyContent: "center" }}>
             <div>
               <p className="font-dm" style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, marginBottom: 12, textAlign: "center" }}>
-                Your framed photo is ready!
+                Your framed memory is ready!
               </p>
               {/* Polaroid wrapper around the rendered image */}
               <div style={{

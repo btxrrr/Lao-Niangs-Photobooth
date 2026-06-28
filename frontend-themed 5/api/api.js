@@ -80,3 +80,16 @@ export const getCaptureImageUrl = (id) =>
   `${BASE_URL}/captures/${id}/image`
 
 export default api
+
+// ─────────────────────────────────────────────────────────────
+// GIF stitch endpoint (backend: POST /clips/stitch)
+// clips: array of Blob (webm video)
+// returns: { gif_url: string }
+// ─────────────────────────────────────────────────────────────
+export const stitchClips = (clips) => {
+  const form = new FormData()
+  clips.forEach((blob, i) => form.append("clips", blob, `clip_${i}.webm`))
+  return api.post("/clips/stitch", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+}

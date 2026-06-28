@@ -4,10 +4,6 @@ from typing import Optional
 import re
 
 
-# ──────────────────────────────────────────────
-# Auth schemas
-# ──────────────────────────────────────────────
-
 class UserRegister(BaseModel):
     email: EmailStr
     username: str = Field(min_length=3, max_length=30)
@@ -15,14 +11,14 @@ class UserRegister(BaseModel):
 
     @field_validator("username")
     @classmethod
-    def username_alphanumeric(cls, v: str) -> str:
+    def username_alphanumeric(cls, v):
         if not re.match(r"^[a-zA-Z0-9_]+$", v):
             raise ValueError("Username may only contain letters, digits, and underscores")
         return v
 
     @field_validator("password")
     @classmethod
-    def password_strength(cls, v: str) -> str:
+    def password_strength(cls, v):
         if not re.search(r"[A-Z]", v):
             raise ValueError("Password must contain at least one uppercase letter")
         if not re.search(r"[0-9]", v):
@@ -42,7 +38,6 @@ class UserOut(BaseModel):
     role: str
     is_active: bool
     created_at: datetime
-
     model_config = {"from_attributes": True}
 
 
@@ -62,17 +57,13 @@ class PasswordReset(BaseModel):
 
     @field_validator("new_password")
     @classmethod
-    def password_strength(cls, v: str) -> str:
+    def password_strength(cls, v):
         if not re.search(r"[A-Z]", v):
             raise ValueError("Password must contain at least one uppercase letter")
         if not re.search(r"[0-9]", v):
             raise ValueError("Password must contain at least one digit")
         return v
 
-
-# ──────────────────────────────────────────────
-# Capture schemas
-# ──────────────────────────────────────────────
 
 class CaptureOut(BaseModel):
     id: int
@@ -84,8 +75,8 @@ class CaptureOut(BaseModel):
     caption: Optional[str]
     frame_style: Optional[str]
     is_flipbook: bool
+    media_type: str
     created_at: datetime
-
     model_config = {"from_attributes": True}
 
 

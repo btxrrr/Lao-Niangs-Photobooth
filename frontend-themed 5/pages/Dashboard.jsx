@@ -76,7 +76,7 @@ export default function Dashboard() {
 
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "40px 24px" }}>
 
-        {/* Title + action buttons */}
+        {/* Title + action buttons — always visible */}
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 12 }}>
           <div>
             <h2 className="font-playfair" style={{ fontSize: 32, color: "white", marginBottom: 6 }}>Your Memories</h2>
@@ -84,7 +84,9 @@ export default function Dashboard() {
               {captures.length === 0 ? "No photos yet" : `${captures.length} photo${captures.length !== 1 ? "s" : ""} saved`}
             </p>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+
+          {/* Buttons always rendered */}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             {captures.length >= 2 && (
               <button
                 className="btn-secondary"
@@ -94,6 +96,13 @@ export default function Dashboard() {
                 <span style={{ fontSize: 16 }}>🎞️</span> Create Frame
               </button>
             )}
+            <button
+              className="btn-secondary"
+              onClick={() => navigate("/gesture-gif")}
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
+              <span style={{ fontSize: 16 }}>🎬</span> GIF Booth
+            </button>
             <button
               className="btn-primary"
               onClick={() => navigate("/photobooth")}
@@ -142,7 +151,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Hint when user has photos but not enough for frames */}
         {!loading && captures.length === 1 && (
           <p className="font-dm" style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, textAlign: "center", marginTop: 24 }}>
             Take one more photo to unlock the Create Frame feature 🎞️
@@ -153,7 +161,6 @@ export default function Dashboard() {
   )
 }
 
-
 function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
   const date    = new Date(capture.created_at)
   const dateStr = date.toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })
@@ -162,11 +169,9 @@ function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
     <div style={{ position: "relative" }}>
       <div className="tape" />
       <div className={`polaroid ${rotate > 0 ? "polaroid-2" : ""}`} style={{ "--rot": `${rotate}deg` }}>
-
         <div style={{ width: "100%", aspectRatio: "1", background: "var(--cream-dark)", borderRadius: 2, overflow: "hidden", marginBottom: 4 }}>
           <AuthImage captureId={capture.id} alt={capture.caption || "Photo"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
-
         <div style={{ padding: "6px 4px 0" }}>
           <p className="font-script" style={{ fontSize: 15, color: "var(--text)", minHeight: 22, textAlign: "center" }}>
             {capture.caption || ""}
@@ -182,7 +187,6 @@ function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
         </div>
       </div>
 
-      {/* Download button */}
       <button
         onClick={() => onDownload(capture.id, capture.original_filename)}
         title="Download photo"
@@ -194,11 +198,8 @@ function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
           cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)", transition: "all 0.2s",
         }}
-      >
-        ⬇
-      </button>
+      >⬇</button>
 
-      {/* Delete button */}
       <button
         onClick={() => onDelete(capture.id)}
         disabled={isDeleting}
@@ -212,9 +213,7 @@ function CaptureCard({ capture, rotate, onDelete, onDownload, isDeleting }) {
           display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)", transition: "all 0.2s",
         }}
-      >
-        {isDeleting ? "..." : "✕"}
-      </button>
+      >{isDeleting ? "..." : "✕"}</button>
     </div>
   )
 }
