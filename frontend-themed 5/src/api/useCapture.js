@@ -31,9 +31,9 @@ function base64ToBlob(base64) {
 }
 
 export function useCapture() {
-  const capture = useCallback(async (base64Image, caption = "", frameStyle = "") => {
+  const capture = useCallback(async (base64Image, caption = "", frameStyle = "", pose = null) => {
     const blob = base64ToBlob(base64Image)
-    const res  = await uploadCapture(blob, caption, frameStyle)
+    const res  = await uploadCapture(blob, caption, frameStyle, pose)
     return res.data   // returns the capture object with { id, filename, ... }
   }, [])
 
