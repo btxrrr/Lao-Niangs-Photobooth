@@ -43,7 +43,7 @@ export default function Landing() {
         <div style={{position:"absolute",top:"18%",left:"4%",animation:"floatY 3.8s ease-in-out infinite","--r":"-8deg"}}>
           <div className="polaroid-wrap" style={{background:"white",padding:"8px 8px 24px",borderRadius:3,boxShadow:"3px 5px 18px rgba(90,122,150,0.25)",transform:"rotate(-8deg)",width:90}}>
             <div style={{width:"100%",height:70,background:"linear-gradient(135deg,#FBD5E8,#A8C4D8)",borderRadius:1,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>🌸</div>
-            <p style={{fontSize:8,color:"#9A8FA8",textAlign:"center",marginTop:6,fontFamily:"Dancing Script,cursive",fontSize:11}}>memories</p>
+            <p style={{fontSize:11,color:"#9A8FA8",textAlign:"center",marginTop:6,fontFamily:"Dancing Script,cursive"}}>memories</p>
           </div>
         </div>
         <div style={{position:"absolute",top:"42%",left:"2%",animation:"floatY2 4.5s ease-in-out infinite","--r":"5deg",animationDelay:"0.8s"}}>
