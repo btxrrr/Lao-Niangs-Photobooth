@@ -22,6 +22,11 @@ def capture_to_out(capture: models.Capture) -> schemas.CaptureOut:
         file_size_bytes=capture.file_size_bytes,
         caption=capture.caption,
         frame_style=capture.frame_style,
+        pose_id=capture.pose_id,
+        pose_label=capture.pose_label,
+        pose_group_size=capture.pose_group_size,
+        pose_theme=capture.pose_theme,
+        pose_mode=capture.pose_mode,
         is_flipbook=bool(capture.is_flipbook),
         media_type=capture.media_type or "photo",
         created_at=capture.created_at,
@@ -33,6 +38,11 @@ async def create_capture(
     file: UploadFile = File(...),
     caption:     Optional[str] = Form(None, max_length=500),
     frame_style: Optional[str] = Form(None, max_length=50),
+    pose_id: Optional[str] = Form(None, max_length=100),
+    pose_label: Optional[str] = Form(None, max_length=100),
+    pose_group_size: Optional[str] = Form(None, max_length=30),
+    pose_theme: Optional[str] = Form(None, max_length=30),
+    pose_mode: Optional[str] = Form(None, max_length=30),
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
@@ -43,6 +53,9 @@ async def create_capture(
         original_filename=file.filename, file_path=file_path,
         content_type=file.content_type, file_size_bytes=file_size,
         caption=caption, frame_style=frame_style,
+        pose_id=pose_id, pose_label=pose_label,
+        pose_group_size=pose_group_size, pose_theme=pose_theme,
+        pose_mode=pose_mode,
     )
     db.add(capture); db.commit(); db.refresh(capture)
     return capture_to_out(capture)

@@ -64,13 +64,18 @@ export const resetPassword = (token, new_password) =>
 // Capture endpoints
 // ─────────────────────────────────────────────────────────────
 
-export const uploadCapture = (imageBlob, caption = "", frameStyle = "") => {
+export const uploadCapture = (imageBlob, caption = "", frameStyle = "", pose = null) => {
   // imageBlob: a Blob or File — react-webcam gives you a base64 string,
   // so we convert it to a Blob first (see useCapture hook below)
   const form = new FormData()
   form.append("file", imageBlob, "capture.jpg")
   if (caption)    form.append("caption", caption)
   if (frameStyle) form.append("frame_style", frameStyle)
+  if (pose?.id) form.append("pose_id", pose.id)
+  if (pose?.label) form.append("pose_label", pose.label)
+  if (pose?.groupSize) form.append("pose_group_size", pose.groupSize)
+  if (pose?.theme) form.append("pose_theme", pose.theme)
+  if (pose?.modeHint) form.append("pose_mode", pose.modeHint)
 
   return api.post("/captures/", form, {
     headers: { "Content-Type": "multipart/form-data" },
