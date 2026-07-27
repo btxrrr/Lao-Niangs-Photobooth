@@ -1,108 +1,116 @@
-﻿# 📸 Lao Niangs Photobooth
+﻿# Lao Niangs Photobooth
 
-A web-based AI-powered photo booth application built with React and FastAPI. Capture photos hands-free using gesture controls, customise your shots with themed frames, and save everything to your personal archive.
+A web-based AI-powered photo booth built with React + FastAPI. Users can capture media with gesture controls, curate memories, compose frame designs, and export content to social sticker formats.
 
----
+## Features
 
-## 🚀 Getting Started
+- User authentication: register, login, logout, profile, password reset flow
+- Gesture photo booth: open-palm trigger, countdown capture, and save to archive
+- Pose Assistant: built-in pose references and custom pose reference uploads by shot type
+- Gesture GIF mode: record 4 clips, reorder, restitch into a looping GIF
+- Smart Frame Studio: layered canvas editor with backgrounds, frames, stickers, image/GIF support, and story layouts
+- Video conversion pipeline: WebM to MP4 backend conversion for browser compatibility
+- Sticker pack export: WhatsApp ZIP generation and Telegram sticker pack publishing
+- Personal archive: per-user media listing, download, and deletion
 
-You will need **two terminals open** — one for the frontend and one for the backend.
+## Tech Stack
 
-### Prerequisites
+| Layer | Technology |
+|---|---|
+| Frontend | React, Vite |
+| Backend | FastAPI, SQLAlchemy |
+| Database | PostgreSQL |
+| Auth | JWT, bcrypt/passlib |
+| CV + Media | MediaPipe, OpenCV, Pillow, PyAV |
 
-- [Node.js](https://nodejs.org/) (v18 or above)
-- [Python](https://www.python.org/) (v3.9 or above)
-- [pip](https://pip.pypa.io/en/stable/)
+## Project Structure
 
----
-
-## ⚙️ Installation
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/btxrrr/Lao-Niangs-Photobooth.git
-cd Lao-Niangs-Photobooth
+```
+Lao-Niangs-Photobooth/
+├── frontend-themed 5/     # React + Vite frontend
+└── backend/               # FastAPI backend
 ```
 
-### 2. Install frontend dependencies
+## Local Setup
+
+Prerequisites:
+
+- Node.js 18+
+- Python 3.9+
+
+1. Install frontend dependencies
 
 ```bash
-cd frontend
+cd "frontend-themed 5"
 npm install
 ```
 
-### 3. Install backend dependencies
+2. Install backend dependencies
 
 ```bash
 cd backend
-pip install -r requirements.txt
+python -m venv venv
+venv\Scripts\activate
+pip install "pydantic[email]" -r requirements.txt
 ```
 
----
-
-## ▶️ Running the App
-
-Open **two terminals** and run the following:
-
-### Terminal 1 — Frontend
+3. Configure backend environment
 
 ```bash
-cd frontend
-npm run dev
+copy .env.example .env
 ```
 
-The frontend will be available at `http://localhost:5173`
+Then update .env with real values (never commit secrets).
 
-### Terminal 2 — Backend
+4. Run backend
 
 ```bash
 cd backend
 uvicorn app.main:app --reload
 ```
 
-The backend API will be available at `http://localhost:8000`
+Backend: http://localhost:8000
 
----
+5. Run frontend
 
-## 🗂️ Project Structure
-
-```
-Lao-Niangs-Photobooth/
-├── frontend/          # React application
-└── backend/           # FastAPI application
-    └── app/
-        └── main.py
+```bash
+cd "frontend-themed 5"
+npm run dev
 ```
 
----
+Frontend: http://localhost:5173
 
-## ✨ Features
+## Deployment Environment Variables
 
-- **User Accounts** — Register, log in, log out, and reset your password
-- **Photo Booth** — Live webcam preview with countdown timer
-- **Gesture-Controlled Shutter** — Trigger captures hands-free using MediaPipe
-- **Smart Frame Studio** — Arrange photos into strips and collages
-- **Personal Archive** — All captures saved to your account
+Set these in your hosting platform secret manager (do not commit real values):
 
----
+Backend variables:
 
-## 🛠️ Tech Stack
+- DATABASE_URL: PostgreSQL connection string
+- SECRET_KEY: JWT signing secret
+- ALGORITHM: JWT algorithm (default HS256)
+- ACCESS_TOKEN_EXPIRE_MINUTES
+- RESET_TOKEN_EXPIRE_MINUTES
+- UPLOAD_DIR
+- MAX_FILE_SIZE_MB
+- ALLOWED_ORIGINS: comma-separated frontend origins
+- TELEGRAM_BOT_TOKEN: required only for Telegram sticker publishing
+- TELEGRAM_BOT_USERNAME: required only for Telegram sticker publishing
 
-| Layer | Technology |
-|---|---|
-| Frontend | React, Vite |
-| Backend | FastAPI, Python |
-| Database | PostgreSQL |
-| Auth | JWT, bcrypt |
-| Computer Vision | MediaPipe, OpenCV |
-| Image Processing | Pillow |
+Frontend variables:
 
----
+- This repository currently hardcodes the backend base URL in frontend API files.
+- Before production deploy, update frontend base URL values from localhost to your deployed backend URL.
 
-## 👥 Team
+## Security Notes
 
-**Lao Niangs** — NUS Orbital AY2025/26 (Apollo 11)
+- Commit .env.example only.
+- Keep .env local and untracked.
+- If any secret was exposed previously, rotate it immediately.
+
+## Team
+
+Lao Niangs - NUS Orbital AY2025/26 (Apollo 11)
 
 | Member | Role |
 |---|---|

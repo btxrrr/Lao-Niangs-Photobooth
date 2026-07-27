@@ -1,105 +1,126 @@
-# Lao Niangs Photo Booth — Backend
+# Lao Niangs Photo Booth Backend
 
-## Folder structure
+## What This Service Handles
 
-```
-backend/
-├── .env                  ← YOUR secrets (never share or commit this)
-├── .env.example          ← template — copy to .env and fill in
-├── requirements.txt      ← all Python dependencies
-├── media/
-│   └── gifs/             ← generated GIFs saved here automatically
-├── app/
-│   ├── __init__.py
-│   ├── main.py           ← FastAPI app entry point
-│   ├── config.py         ← reads settings from .env
-│   ├── database.py       ← PostgreSQL connection
-│   ├── models.py         ← database tables (User, Capture)
-│   ├── schemas.py        ← request/response validation
-│   ├── auth.py           ← password hashing + JWT tokens
-│   ├── dependencies.py   ← get_current_user (JWT check)
-│   ├── utils.py          ← file upload helpers
-│   ├── uploads/          ← saved photos stored here
-│   └── routes/
-│       ├── __init__.py
-│       ├── auth_routes.py     ← /auth/*
-│       ├── capture_routes.py  ← /captures/*
-│       └── gif_routes.py      ← /clips/stitch + /media/gifs/*
-```
+- JWT authentication and user profile endpoints
+- Media upload/list/read/delete for captures
+- Gesture GIF stitching from 4 video clips
+- WebM to MP4 conversion endpoint for Smart Frame Studio
+- Pose reference upload/list/image/delete
+- Sticker export for WhatsApp ZIP and Telegram publishing
 
-## First-time setup
+## Setup
 
-### Step 1 — Create virtual environment
-```
+1. Create and activate a virtual environment
+
+```bash
 python -m venv venv
-```
-
-### Step 2 — Activate it
-Windows:
-```
 venv\Scripts\activate
 ```
-Mac/Linux:
-```
-source venv/bin/activate
-```
 
-### Step 3 — Install dependencies
-```
+2. Install dependencies
+
+```bash
 pip install "pydantic[email]" -r requirements.txt
 ```
 
-### Step 4 — Create your .env file
-```
+3. Create environment file
+
+```bash
 copy .env.example .env
 ```
-Then open .env in Notepad and fill in:
-- DATABASE_URL → your Neon connection string (get it from neon.tech)
-- SECRET_KEY   → any long random string e.g. mysecretkey123abc!
 
-### Step 5 — Run the server
-```
+4. Run API
+
+```bash
 uvicorn app.main:app --reload
 ```
 
-Server runs at: http://localhost:8000
-API docs at:    http://localhost:8000/docs
+API base URL: http://localhost:8000
+Swagger docs: http://localhost:8000/docs
 
-## All endpoints
+## Environment Variables
 
-### Auth
-| Method | Path | Auth required | What it does |
-|--------|------|---------------|--------------|
-| POST | /auth/register | No | Create account |
-| POST | /auth/login | No | Get JWT token |
-| GET | /auth/me | Yes | Get logged-in user |
-| POST | /auth/logout | Yes | Log out |
-| POST | /auth/request-password-reset | No | Generate reset token |
-| POST | /auth/reset-password | No | Apply new password |
+Required for all environments:
 
-### Captures (photos)
-| Method | Path | Auth required | What it does |
-|--------|------|---------------|--------------|
-| POST | /captures/ | Yes | Upload a photo |
-| GET | /captures/ | Yes | List all my photos |
-| GET | /captures/{id} | Yes | Get photo metadata |
-| GET | /captures/{id}/image | Yes | Download the photo file |
-| DELETE | /captures/{id} | Yes | Delete a photo |
+- DATABASE_URL: PostgreSQL URL used by SQLAlchemy at startup
+- SECRET_KEY: JWT signing secret
 
-### GIF
-| Method | Path | Auth required | What it does |
-|--------|------|---------------|--------------|
-| POST | /clips/stitch | Yes | Send 4 clips, get back a GIF |
-| GET | /media/gifs/{filename} | Yes | Download a generated GIF |
+Optional with sensible defaults:
 
-## Password reset flow (development)
-1. Call POST /auth/request-password-reset with the email
-2. Check your backend terminal — it prints the full reset URL:
-   http://localhost:5173/reset-password?token=abc123...
-3. Open that URL in the browser
-4. Enter new password
+- ALGORITHM: JWT algorithm, default HS256
+- ACCESS_TOKEN_EXPIRE_MINUTES
+- RESET_TOKEN_EXPIRE_MINUTES
+- UPLOAD_DIR
+- MAX_FILE_SIZE_MB
+- ALLOWED_ORIGINS: comma-separated origins for CORS
 
-## Running tests (no Postgres needed)
-```
+Optional for Telegram sticker export:
+
+- TELEGRAM_BOT_TOKEN
+- TELEGRAM_BOT_USERNAME
+
+Deployment notes:
+
+- Do not commit .env.
+- Commit .env.example only.
+- Configure real values in your host's environment variable dashboard.
+
+## Endpoint Summary
+
+Auth:
+
+- POST /auth/register
+- POST /auth/login
+- GET /auth/me
+- POST /auth/logout
+- POST /auth/request-password-reset
+- POST /auth/reset-password
+
+Captures:
+
+- POST /captures/
+- GET /captures/
+- GET /captures/{id}
+- GET /captures/{id}/image
+- DELETE /captures/{id}
+
+GIF and video:
+
+- POST /clips/stitch
+- GET /media/gifs/{filename}
+- POST /clips/convert-mp4
+
+Pose references:
+
+- POST /poses/
+- GET /poses/
+- GET /poses/{pose_id}/image
+- DELETE /poses/{pose_id}
+
+Sticker export:
+
+- POST /stickers/export
+- GET /stickers/artifacts/{user_id}/{filename}
+
+System:
+
+- GET /health
+
+## Common Startup Errors
+
+Error: ModuleNotFoundError: No module named app
+
+- Cause: Started uvicorn from repo root.
+- Fix: run from backend folder, or use --app-dir backend.
+
+Error: psycopg2 OperationalError connection refused on localhost:5432
+
+- Cause: DATABASE_URL points to local Postgres, but DB is not running.
+- Fix: start Postgres or switch DATABASE_URL to a live hosted Postgres instance.
+
+## Tests
+
+```bash
 set DISABLE_RATE_LIMIT=1 && pytest -v
 ```
