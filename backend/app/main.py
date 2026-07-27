@@ -9,7 +9,7 @@ from sqlalchemy import inspect, text
 
 from app.config import get_settings
 from app.database import Base, engine
-from app.routes import auth_routes, capture_routes, gif_routes
+from app.routes import auth_routes, capture_routes, gif_routes, sticker_routes
 
 settings = get_settings()
 
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(auth_routes.router)
 app.include_router(capture_routes.router)
 app.include_router(gif_routes.router)
+app.include_router(sticker_routes.router)
 
 # ── Swagger: plain Bearer token input ─────────────────────────
 def custom_openapi():
