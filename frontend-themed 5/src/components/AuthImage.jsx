@@ -5,26 +5,33 @@ import { getCaptureImageUrl } from "../api/api"
 // Normal <img> tags can't send an Authorization header,
 // so photos behind the JWT-protected endpoint won't load.
 //
-// This component fetches the image as a blob using axios
-// (which does send the token), then creates a local URL for it.
-// Use this anywhere you need to display a saved capture.
+// This component fetches the image as a blob using fetch (with the
+// token attached manually), then creates a local URL for it. Use this
+// anywhere you need to display an image served from a protected
+// endpoint — a saved capture, a custom pose reference, etc.
 //
 // Usage:
 //   <AuthImage captureId={capture.id} alt="My photo" style={{ width: "100%" }} />
+//   <AuthImage src={getPoseReferenceImageUrl(pose.refId)} alt="My pose" style={{ width: "100%" }} />
 // ─────────────────────────────────────────────────────────────
 
-export default function AuthImage({ captureId, alt = "Photo", style = {}, className = "" }) {
+export default function AuthImage({ captureId, src: srcUrl, alt = "Photo", style = {}, className = "" }) {
   const [src,      setSrc]      = useState(null)
   const [loading,  setLoading]  = useState(true)
   const [errored,  setErrored]  = useState(false)
 
+  const url = srcUrl || (captureId ? getCaptureImageUrl(captureId) : null)
+
   useEffect(() => {
-    if (!captureId) return
+    if (!url) return
 
     const token = localStorage.getItem("token")
     if (!token) { setErrored(true); setLoading(false); return }
 
-    fetch(getCaptureImageUrl(captureId), {
+    setLoading(true)
+    setErrored(false)
+
+    fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -39,7 +46,7 @@ export default function AuthImage({ captureId, alt = "Photo", style = {}, classN
 
     // Clean up the object URL when the component unmounts
     return () => { if (src) URL.revokeObjectURL(src) }
-  }, [captureId])
+  }, [url])
 
   if (loading) {
     return (

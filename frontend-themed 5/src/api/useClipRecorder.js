@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback } from "react"
+import fixWebmDuration from "fix-webm-duration"
 
 const CLIP_DURATION_MS = 3000   // each clip is 3 seconds
 const MIN_CLIP_MS      = 1500   // reject clips shorter than this
@@ -28,7 +29,7 @@ export function useClipRecorder({ videoRef }) {
       if (e.data.size > 0) chunksRef.current.push(e.data)
     }
 
-    mr.onstop = () => {
+    mr.onstop = async () => {
       const duration = Date.now() - startTimeRef.current
       if (duration < MIN_CLIP_MS) {
         // Too short — reject
@@ -36,7 +37,21 @@ export function useClipRecorder({ videoRef }) {
         setActiveSlot(null)
         return
       }
-      const blob = new Blob(chunksRef.current, { type: "video/webm" })
+      const rawBlob = new Blob(chunksRef.current, { type: "video/webm" })
+
+      // MediaRecorder writes WebM files with no Duration/Cues metadata,
+      // so <video> elements playing straight from the blob report
+      // duration === Infinity and can get stuck rendering only the very
+      // first frame instead of actually playing. Patch that metadata in
+      // using the known recording duration so every clip preview (and
+      // the exported GIF) reflects its own real motion.
+      let blob = rawBlob
+      try {
+        blob = await fixWebmDuration(rawBlob, duration, { logger: false })
+      } catch (err) {
+        console.warn("Could not patch WebM duration metadata:", err)
+      }
+
       setClips((prev) => {
         const next = [...prev]
         next[slotIndex] = blob

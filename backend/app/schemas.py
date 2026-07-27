@@ -80,5 +80,16 @@ class CaptureOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PoseReferenceOut(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    shot_type: str
+    original_filename: Optional[str]
+    content_type: Optional[str]
+    created_at: datetime
+    model_config = {"from_attributes": True}
+
+
 class MessageResponse(BaseModel):
     message: str

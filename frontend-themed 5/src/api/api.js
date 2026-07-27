@@ -104,3 +104,50 @@ export const stitchClips = (clips) => {
     headers: { "Content-Type": "multipart/form-data" },
   })
 }
+
+// ─────────────────────────────────────────────────────────────
+// WebM → MP4 conversion (backend: POST /clips/convert-mp4)
+// videoBlob: a Blob (webm video, e.g. from Smart Frame Studio export)
+// returns: an axios response whose .data is the MP4 as a Blob
+//
+// Browsers can only reliably *record* WebM, and in-browser WASM
+// transcoding (ffmpeg.wasm) is unreliable on Safari, so the actual
+// WebM→MP4 conversion happens server-side here instead — it works the
+// same in every browser since the browser is just uploading/
+// downloading bytes.
+// ─────────────────────────────────────────────────────────────
+export const convertVideoToMp4 = (videoBlob) => {
+  const form = new FormData()
+  form.append("video", videoBlob, "input.webm")
+  return api.post("/clips/convert-mp4", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+    responseType: "blob",
+  })
+}
+
+// ─────────────────────────────────────────────────────────────
+// Custom Pose References (backend: /poses)
+//
+// Lets a user upload their own pose guide image (any art style —
+// anime, a plain outline sketch, an actual photo) instead of the
+// built-in procedural stick-figure poses, name it, and have it show
+// up in the Pose Assistant library for that shot type going forward.
+// ─────────────────────────────────────────────────────────────
+export const uploadPoseReference = (file, name, shotType) => {
+  const form = new FormData()
+  form.append("file", file)
+  form.append("name", name)
+  form.append("shot_type", shotType)
+  return api.post("/poses/", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+}
+
+export const listPoseReferences = (shotType) =>
+  api.get("/poses/", { params: shotType ? { shot_type: shotType } : {} })
+
+export const deletePoseReference = (id) =>
+  api.delete(`/poses/${id}`)
+
+export const getPoseReferenceImageUrl = (id) =>
+  `${BASE_URL}/poses/${id}/image`

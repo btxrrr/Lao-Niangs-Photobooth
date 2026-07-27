@@ -1,223 +1,202 @@
 // ─────────────────────────────────────────────────────────────
-// Pose Assistant — pose template library
+// Pose Assistant — pose reference library
 //
-// Each pose is described declaratively as one or more stick-figure
-// "actors" (see components/PoseSilhouette.jsx for the renderer) so
-// the whole library stays lightweight (no image assets to ship) and
-// easy to extend — add a new object here and it shows up everywhere.
+// The library is entirely image-based: either a bundled default
+// (shipped with the app, in public/pose-refs/, added below) or a
+// custom photo a user uploaded themselves through the Pose Assistant
+// modal (stored server-side via the /poses API — see PoseLibraryModal
+// and api.js). There's no procedural stick-figure generation — every
+// pose the user picks is a real reference image.
 //
-// Single/Couple poses have a fixed actor count (1 / 2). Group poses
-// are *templates*: the user tells us how many people are in the
-// shot, and generateGroupActors() lays out that many stick figures
-// in the chosen style (lineup / jump / huddle / pyramid) so every
-// group pose works for anywhere from 3 to 10 people.
-//
-// Actor fields (all in a 0–100 x 0–100 canvas, mirrored for camera):
-//   x, y      — hip anchor position
-//   scale     — overall size multiplier
-//   armL/armR — "down" | "up" | "out" | "hip" | "wave" | "heart"
-//   legs      — "stand" | "apart" | "cross" | "kick" | "sit"
-//   headTilt  — degrees, small head tilt for personality
+// Shot types are four fixed headcounts — no free-form "how many
+// people" picker, since a reference image is for an exact number of
+// people, not a generated layout that can stretch to fit any group
+// size.
 // ─────────────────────────────────────────────────────────────
 
 export const POSE_TYPES = [
-  { id: "single", label: "Single",  emoji: "🧍", description: "Just you" },
-  { id: "couple", label: "Couple",  emoji: "🧑‍🤝‍🧑", description: "Two people" },
-  { id: "group",  label: "Group",   emoji: "👥", description: "Three or more" },
+  { id: "single", label: "Single", emoji: "🧍",              description: "Just you" },
+  { id: "duo",    label: "Duo",    emoji: "🧑‍🤝‍🧑",           description: "Two people" },
+  { id: "trio",   label: "Trio",   emoji: "👯",               description: "Three people" },
+  { id: "quad",   label: "Quad",   emoji: "👨‍👩‍👧‍👦",          description: "Four people" },
 ]
 
-export const GROUP_SIZE_MIN = 3
-export const GROUP_SIZE_MAX = 10
-export const GROUP_SIZE_DEFAULT = 4
-
-export const POSES = [
+// ── Default reference-image poses ────────────────────────────
+//
+// Bundled actual illustrated poses (shipped with the app, in
+// public/pose-refs/) that show up in every user's Pose Assistant
+// library automatically — no upload needed. This is separate from
+// the per-user custom uploads (backend PoseReference model), which
+// only that account sees.
+//
+//   { id: "default-xyz", kind: "default", type: "single" | "duo" | "trio" | "quad",
+//     label: "Display name", tip: "Short instruction", src: "/pose-refs/xyz.png" }
+export const DEFAULT_POSE_IMAGES = [
   // ── Single ──────────────────────────────────────────────
-  {
-    id: "single-peace",
-    type: "single",
-    label: "Peace Sign",
-    tip: "Flash a peace sign near your face",
-    actors: [{ x: 50, y: 62, scale: 1.15, armL: "down", armR: "peace", legs: "stand", headTilt: -4 }],
-  },
-  {
-    id: "single-hands-heart",
-    type: "single",
-    label: "Hands Heart",
-    tip: "Form a heart shape with both hands",
-    actors: [{ x: 50, y: 62, scale: 1.15, armL: "heartL", armR: "heartR", legs: "stand", headTilt: 0 }],
-  },
-  {
-    id: "single-hip",
-    type: "single",
-    label: "Hand on Hip",
-    tip: "One hand on your hip, weight on one leg",
-    actors: [{ x: 50, y: 62, scale: 1.15, armL: "hip", armR: "down", legs: "cross", headTilt: 6 }],
-  },
-  {
-    id: "single-jump",
-    type: "single",
-    label: "Jump Shot",
-    tip: "Jump with arms and legs spread wide",
-    actors: [{ x: 50, y: 55, scale: 1.15, armL: "up", armR: "up", legs: "kick", headTilt: -3 }],
-  },
-  {
-    id: "single-wave",
-    type: "single",
-    label: "Friendly Wave",
-    tip: "Wave at the camera with a big smile",
-    actors: [{ x: 50, y: 62, scale: 1.15, armL: "down", armR: "wave", legs: "stand", headTilt: -5 }],
-  },
+  { id: "default-solo-hand-on-hip", kind: "default", type: "single",
+    label: "Hand on Hip", tip: "Stand with one hand on your hip, confident smile",
+    src: "/pose-refs/solo-hand-on-hip.png" },
+  { id: "default-solo-peace-sign", kind: "default", type: "single",
+    label: "Peace Sign", tip: "Flash a peace sign near your face",
+    src: "/pose-refs/solo-peace-sign.png" },
+  { id: "default-solo-over-shoulder-look", kind: "default", type: "single",
+    label: "Over the Shoulder Look", tip: "Glance back over your shoulder",
+    src: "/pose-refs/solo-over-shoulder-look.png" },
+  { id: "default-solo-twirling-skirt", kind: "default", type: "single",
+    label: "Twirling Skirt", tip: "Mid-twirl with your outfit flaring out",
+    src: "/pose-refs/solo-twirling-skirt.png" },
+  { id: "default-solo-blowing-kiss", kind: "default", type: "single",
+    label: "Blowing a Kiss", tip: "Hand near your lips, blowing a kiss to the camera",
+    src: "/pose-refs/solo-blowing-kiss.png" },
+  { id: "default-solo-adjusting-hair", kind: "default", type: "single",
+    label: "Adjusting Hair", tip: "Tuck a strand of hair behind your ear",
+    src: "/pose-refs/solo-adjusting-hair.png" },
+  { id: "default-solo-sitting-cross-legged", kind: "default", type: "single",
+    label: "Sitting Cross-Legged", tip: "Sit on the floor in a relaxed pose",
+    src: "/pose-refs/solo-sitting-cross-legged.png" },
+  { id: "default-solo-jumping-shot", kind: "default", type: "single",
+    label: "Jumping Shot", tip: "Mid-air jump, arms and legs spread",
+    src: "/pose-refs/solo-jumping-shot.png" },
+  { id: "default-solo-candid-laugh", kind: "default", type: "single",
+    label: "Candid Laugh", tip: "Caught mid-laugh, looking away from the camera",
+    src: "/pose-refs/solo-candid-laugh.png" },
+  { id: "default-solo-looking-at-phone", kind: "default", type: "single",
+    label: "Looking at Phone", tip: "Glance down at your phone with a soft smile",
+    src: "/pose-refs/solo-looking-at-phone.png" },
+  { id: "default-solo-selfie-angle", kind: "default", type: "single",
+    label: "Selfie Angle", tip: "Hold your phone up for a selfie",
+    src: "/pose-refs/solo-selfie-angle.png" },
+  { id: "default-solo-winking", kind: "default", type: "single",
+    label: "Winking", tip: "Playful wink toward the camera",
+    src: "/pose-refs/solo-winking.png" },
+  { id: "default-solo-hand-near-face", kind: "default", type: "single",
+    label: "Hand Near Face", tip: "Rest your chin or cheek on your hand",
+    src: "/pose-refs/solo-hand-near-face.png" },
+  { id: "default-solo-walking-shot", kind: "default", type: "single",
+    label: "Walking Shot", tip: "Mid-stride, looking back at the camera",
+    src: "/pose-refs/solo-walking-shot.png" },
+  { id: "default-solo-leaning-on-wall", kind: "default", type: "single",
+    label: "Leaning on Wall", tip: "Lean casually against a wall",
+    src: "/pose-refs/solo-leaning-on-wall.png" },
+  { id: "default-solo-hands-in-pockets", kind: "default", type: "single",
+    label: "Hands in Pockets", tip: "Relaxed stance with hands tucked in your pockets",
+    src: "/pose-refs/solo-hands-in-pockets.png" },
+  { id: "default-solo-playing-necklace", kind: "default", type: "single",
+    label: "Playing with Necklace", tip: "Fingers lightly touching a necklace",
+    src: "/pose-refs/solo-playing-necklace.png" },
+  { id: "default-solo-looking-back", kind: "default", type: "single",
+    label: "Looking Back", tip: "Turned away, glancing back over one shoulder",
+    src: "/pose-refs/solo-looking-back.png" },
+  { id: "default-solo-sitting-on-steps", kind: "default", type: "single",
+    label: "Sitting on Steps", tip: "Seated on steps, chin resting on your knees",
+    src: "/pose-refs/solo-sitting-on-steps.png" },
+  { id: "default-solo-twirl-spin", kind: "default", type: "single",
+    label: "Twirl Spin", tip: "Caught mid-spin, hair and outfit in motion",
+    src: "/pose-refs/solo-twirl-spin.png" },
 
-  // ── Couple ──────────────────────────────────────────────
-  {
-    id: "couple-shoulder",
-    type: "couple",
-    label: "Arm Around",
-    tip: "One arm around your partner's shoulder",
-    actors: [
-      { x: 36, y: 62, scale: 1.05, armL: "down", armR: "shoulderR", legs: "stand", headTilt: -6 },
-      { x: 64, y: 62, scale: 1.05, armL: "shoulderL", armR: "down", legs: "stand", headTilt: 6 },
-    ],
-  },
-  {
-    id: "couple-back-to-back",
-    type: "couple",
-    label: "Back to Back",
-    tip: "Stand back-to-back, arms crossed",
-    actors: [
-      { x: 38, y: 62, scale: 1.05, armL: "hip", armR: "hip", legs: "cross", headTilt: -8, mirror: true },
-      { x: 62, y: 62, scale: 1.05, armL: "hip", armR: "hip", legs: "cross", headTilt: 8 },
-    ],
-  },
-  {
-    id: "couple-heart",
-    type: "couple",
-    label: "Shared Heart",
-    tip: "Each forms half a heart with inside hands",
-    actors: [
-      { x: 38, y: 62, scale: 1.05, armL: "down", armR: "heartR", legs: "stand", headTilt: -5 },
-      { x: 62, y: 62, scale: 1.05, armL: "heartL", armR: "down", legs: "stand", headTilt: 5 },
-    ],
-  },
-  {
-    id: "couple-piggyback",
-    type: "couple",
-    label: "Piggyback",
-    tip: "One hops on the other's back",
-    actors: [
-      { x: 40, y: 66, scale: 1.1, armL: "down", armR: "down", legs: "apart", headTilt: -4 },
-      { x: 58, y: 50, scale: 0.95, armL: "up", armR: "up", legs: "sit", headTilt: 6 },
-    ],
-  },
+  // ── Duo ─────────────────────────────────────────────────
+  { id: "default-duo-side-hug-smile", kind: "default", type: "duo",
+    label: "Side Hug Smile", tip: "Stand side by side with an arm around each other, smiling",
+    src: "/pose-refs/duo-side-hug-smile.png" },
+  { id: "default-duo-back-hug", kind: "default", type: "duo",
+    label: "Back Hug", tip: "One hugs the other from behind",
+    src: "/pose-refs/duo-back-hug.png" },
+  { id: "default-duo-emotional-hug", kind: "default", type: "duo",
+    label: "Emotional Hug", tip: "A warm, close two-person hug",
+    src: "/pose-refs/duo-emotional-hug.png" },
+  { id: "default-duo-head-rest", kind: "default", type: "duo",
+    label: "Head Rest", tip: "One resting her head on the other's shoulder",
+    src: "/pose-refs/duo-head-rest.png" },
+  { id: "default-duo-leaning-laugh", kind: "default", type: "duo",
+    label: "Leaning Laugh", tip: "Leaning into each other laughing",
+    src: "/pose-refs/duo-leaning-laugh.png" },
+  { id: "default-duo-playful-pull", kind: "default", type: "duo",
+    label: "Playful Pull", tip: "One playfully pulling the other closer",
+    src: "/pose-refs/duo-playful-pull.png" },
+  { id: "default-duo-facing-laugh", kind: "default", type: "duo",
+    label: "Facing Laugh", tip: "Facing each other, laughing",
+    src: "/pose-refs/duo-facing-laugh.png" },
+  { id: "default-duo-teasing-poke", kind: "default", type: "duo",
+    label: "Teasing Poke", tip: "One poking the other's cheek, both laughing",
+    src: "/pose-refs/duo-teasing-poke.png" },
+  { id: "default-duo-holding-hands-spin", kind: "default", type: "duo",
+    label: "Holding Hands Spin", tip: "Holding hands, mid-spin",
+    src: "/pose-refs/duo-holding-hands-spin.png" },
+  { id: "default-duo-forward-pull", kind: "default", type: "duo",
+    label: "Forward Pull", tip: "One pulling the other forward by the hand",
+    src: "/pose-refs/duo-forward-pull.png" },
+  { id: "default-duo-fun-jump", kind: "default", type: "duo",
+    label: "Fun Jump", tip: "Both jumping together",
+    src: "/pose-refs/duo-fun-jump.png" },
+  { id: "default-duo-eye-cover", kind: "default", type: "duo",
+    label: "Eye Cover", tip: "One covering the other's eyes from behind",
+    src: "/pose-refs/duo-eye-cover.png" },
+  { id: "default-duo-close-selfie", kind: "default", type: "duo",
+    label: "Close Selfie", tip: "Leaning in close together for a selfie",
+    src: "/pose-refs/duo-close-selfie.png" },
+  { id: "default-duo-phone-laugh", kind: "default", type: "duo",
+    label: "Phone Laugh", tip: "Both laughing at something on a phone",
+    src: "/pose-refs/duo-phone-laugh.png" },
+  { id: "default-duo-mirror-pose", kind: "default", type: "duo",
+    label: "Mirror Pose", tip: "Posing together in a mirror selfie",
+    src: "/pose-refs/duo-mirror-pose.png" },
+  { id: "default-duo-group-mirror-pose", kind: "default", type: "duo",
+    label: "Group Mirror Pose", tip: "A wider mirror shot with both fully visible",
+    src: "/pose-refs/duo-group-mirror-pose.png" },
+  { id: "default-duo-adjusting-pose", kind: "default", type: "duo",
+    label: "Adjusting Pose", tip: "One adjusting the other's hair",
+    src: "/pose-refs/duo-adjusting-pose.png" },
+  { id: "default-duo-photo-check", kind: "default", type: "duo",
+    label: "Photo Check", tip: "Both looking at a phone reviewing a photo",
+    src: "/pose-refs/duo-photo-check.png" },
+  { id: "default-duo-selfie-peace", kind: "default", type: "duo",
+    label: "Selfie Peace", tip: "Both flashing peace signs for a selfie",
+    src: "/pose-refs/duo-selfie-peace.png" },
+  { id: "default-duo-whispering-secret", kind: "default", type: "duo",
+    label: "Whispering Secret", tip: "One whispering into the other's ear",
+    src: "/pose-refs/duo-whispering-secret.png" },
 
-  // ── Group (templates — actors generated per group size) ──
-  {
-    id: "group-lineup",
-    type: "group",
-    label: "Classic Lineup",
-    tip: "Everyone stands shoulder to shoulder, arms linked",
-    style: "lineup",
-  },
-  {
-    id: "group-jump",
-    type: "group",
-    label: "Group Jump",
-    tip: "Everyone jumps together on 3",
-    style: "jump",
-  },
-  {
-    id: "group-huddle",
-    type: "group",
-    label: "Huddle In",
-    tip: "Lean heads in close together",
-    style: "huddle",
-  },
-  {
-    id: "group-pyramid",
-    type: "group",
-    label: "Staggered Pyramid",
-    tip: "Alternate crouching and standing for a staggered look",
-    style: "pyramid",
-  },
+  // ── Trio ────────────────────────────────────────────────
+  // Only one clean 3-person pose came out of the generated set so far —
+  // the rest were miscounted (2 or 4 people). Add more here as you
+  // generate/upload additional trio images.
+  { id: "default-trio-back-hug", kind: "default", type: "trio",
+    label: "Back Hug", tip: "One hugs the other two from behind",
+    src: "/pose-refs/trio-back-hug.png" },
+
+  // ── Quad ────────────────────────────────────────────────
+  { id: "default-quad-classic-lineup", kind: "default", type: "quad",
+    label: "Classic Lineup", tip: "All four standing side by side, arms linked",
+    src: "/pose-refs/quad-classic-lineup.png" },
+  { id: "default-quad-group-jump", kind: "default", type: "quad",
+    label: "Group Jump", tip: "All four jumping together in mid-air",
+    src: "/pose-refs/quad-group-jump.png" },
+  { id: "default-quad-staggered-pyramid", kind: "default", type: "quad",
+    label: "Staggered Pyramid", tip: "Two crouching in front, two standing behind",
+    src: "/pose-refs/quad-staggered-pyramid.png" },
+  { id: "default-quad-arm-chain", kind: "default", type: "quad",
+    label: "Arm Chain", tip: "Each with an arm around the next one's shoulder, in a row",
+    src: "/pose-refs/quad-arm-chain.png" },
+  { id: "default-quad-walking-row", kind: "default", type: "quad",
+    label: "Walking Row", tip: "All four walking side by side toward the camera",
+    src: "/pose-refs/quad-walking-row.png" },
+  { id: "default-quad-high-five-pile", kind: "default", type: "quad",
+    label: "High Five Pile", tip: "All four hands stacked together in one high five",
+    src: "/pose-refs/quad-high-five-pile.png" },
+  { id: "default-quad-train-formation", kind: "default", type: "quad",
+    label: "Train Formation", tip: "Each with hands on the shoulders of the one in front",
+    src: "/pose-refs/quad-train-formation.png" },
+  { id: "default-quad-group-twirl", kind: "default", type: "quad",
+    label: "Group Twirl", tip: "All four spinning together, hair and skirts in motion",
+    src: "/pose-refs/quad-group-twirl.png" },
+  { id: "default-quad-diamond-formation", kind: "default", type: "quad",
+    label: "Diamond Formation", tip: "One in front, two on the sides, one in back",
+    src: "/pose-refs/quad-diamond-formation.png" },
+  { id: "default-quad-piggyback-pair", kind: "default", type: "quad",
+    label: "Piggyback Pair", tip: "Two pairs, each giving the other a piggyback",
+    src: "/pose-refs/quad-piggyback-pair.png" },
 ]
 
-// ── Group actor generation ───────────────────────────────────
-function evenlySpacedX(n, marginPct) {
-  if (n <= 1) return [50]
-  const start = marginPct
-  const end = 100 - marginPct
-  const step = (end - start) / (n - 1)
-  return Array.from({ length: n }, (_, i) => start + step * i)
-}
-
-function groupScale(n) {
-  // more people → smaller each figure, so the whole group still fits
-  return Math.max(0.5, Math.min(0.95, 0.98 - (n - 3) * 0.055))
-}
-
-export function clampGroupSize(n) {
-  return Math.max(GROUP_SIZE_MIN, Math.min(GROUP_SIZE_MAX, Math.round(n) || GROUP_SIZE_DEFAULT))
-}
-
-export function generateGroupActors(style, rawN) {
-  const n = clampGroupSize(rawN)
-  const margin = n > 6 ? 7 : 12
-  const xs = evenlySpacedX(n, margin)
-  const s = groupScale(n)
-  const mid = (n - 1) / 2
-
-  switch (style) {
-    case "lineup":
-      return xs.map((x, i) => ({
-        x, y: 64, scale: s,
-        armL: i === 0 ? "down" : "shoulderL",
-        armR: i === n - 1 ? "down" : "shoulderR",
-        legs: "stand",
-        headTilt: (i - mid) * 2.5,
-      }))
-
-    case "jump":
-      return xs.map((x, i) => ({
-        x, y: i % 2 === 0 ? 52 : 55, scale: s * 0.95,
-        armL: "up", armR: "up", legs: "kick",
-        headTilt: i % 2 === 0 ? -5 : 5,
-      }))
-
-    case "huddle":
-      return xs.map((x, i) => ({
-        x, y: 58 + Math.abs(i - mid) * 2.2, scale: s,
-        armL: i === 0 ? "hip" : "shoulderL",
-        armR: i === n - 1 ? "hip" : "shoulderR",
-        legs: "stand",
-        headTilt: (mid - i) * 4,
-      }))
-
-    case "pyramid":
-      return xs.map((x, i) => {
-        const front = i % 2 === 1
-        return {
-          x, y: front ? 72 : 60, scale: front ? s * 0.82 : s,
-          armL: front ? "peace" : "down",
-          armR: front ? "hip" : "up",
-          legs: front ? "sit" : "stand",
-          headTilt: (i - mid) * 3,
-        }
-      })
-
-    default:
-      return xs.map((x) => ({ x, y: 62, scale: s, armL: "down", armR: "down", legs: "stand", headTilt: 0 }))
-  }
-}
-
-export function getPosesByType(type, groupSize = GROUP_SIZE_DEFAULT) {
-  const pool = POSES.filter((p) => p.type === type)
-  if (type !== "group") return pool
-  const n = clampGroupSize(groupSize)
-  return pool.map((p) => ({ ...p, actors: generateGroupActors(p.style, n), groupSize: n }))
-}
-
-export function getRandomPose(type, groupSize = GROUP_SIZE_DEFAULT) {
-  const pool = getPosesByType(type, groupSize)
-  if (pool.length === 0) return null
-  return pool[Math.floor(Math.random() * pool.length)]
+export function getDefaultPoseImages(type) {
+  return DEFAULT_POSE_IMAGES.filter((p) => p.type === type)
 }
