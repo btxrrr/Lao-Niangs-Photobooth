@@ -1,0 +1,283 @@
+diff --git a/frontend-themed 5/src/components/PoseLibraryModal.jsx b/frontend-themed 5/src/components/PoseLibraryModal.jsx
+index 283b6ae..8fd69a9 100644
+--- a/frontend-themed 5/src/components/PoseLibraryModal.jsx	
++++ b/frontend-themed 5/src/components/PoseLibraryModal.jsx	
+@@ -1,25 +1,48 @@
+-import { useState, useMemo } from "react"
+-import { POSE_TYPES, getPosesByType, getRandomPose } from "../data/poses"
++import { useState, useMemo, useEffect } from "react"
++import {
++  POSE_TYPES, getPosesByType, getRandomPose,
++  GROUP_SIZE_MIN, GROUP_SIZE_MAX, GROUP_SIZE_DEFAULT, clampGroupSize,
++} from "../data/poses"
+ import PoseSilhouette from "./PoseSilhouette"
+ 
+ // ─────────────────────────────────────────────────────────────
+ // PoseLibraryModal — Feature 6: Pose Assistant
+ //
+ // Two interaction modes live here:
+-//   • Pose Library Mode  — pick a shot type, browse filtered poses,
++//   • Pose Library Mode  — pick a shot type (for Group, also enter
++//                           how many people), browse filtered poses,
+ //                           tap one to select it.
+ //   • Pose Roulette Mode — "Feeling Lucky" instantly picks a random
+ //                           pose from the same filtered list.
+ //
++// Poses are filtered (and, for Group, generated) according to the
++// selected shot type / group size, so a suggested pose always fits
++// the number of people actually in the shot.
++//
+ // onSelect(pose | null) is called when the user confirms a pose or
+ // explicitly skips ("No pose, thanks").
+ // ─────────────────────────────────────────────────────────────
+ export default function PoseLibraryModal({ onSelect, onClose }) {
+   const [shotType, setShotType] = useState("single")
+-  const poses = useMemo(() => getPosesByType(shotType), [shotType])
++  const [groupSize, setGroupSize] = useState(GROUP_SIZE_DEFAULT)
++
++  // Reset the group-size stepper to a sane default whenever the
++  // user leaves Group mode and comes back.
++  useEffect(() => {
++    if (shotType !== "group") setGroupSize(GROUP_SIZE_DEFAULT)
++  }, [shotType])
++
++  const poses = useMemo(
++    () => getPosesByType(shotType, groupSize),
++    [shotType, groupSize]
++  )
++
++  const adjustGroupSize = (delta) => {
++    setGroupSize((n) => clampGroupSize(n + delta))
++  }
+ 
+   const handleLucky = () => {
+-    const pose = getRandomPose(shotType)
++    const pose = getRandomPose(shotType, groupSize)
+     if (pose) onSelect(pose)
+   }
+ 
+@@ -46,7 +69,7 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
+         </p>
+ 
+         {/* Shot type selector */}
+-        <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
++        <div style={{ display: "flex", gap: 8, marginBottom: shotType === "group" ? 16 : 20 }}>
+           {POSE_TYPES.map((t) => (
+             <button
+               key={t.id}
+@@ -67,6 +90,33 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
+           ))}
+         </div>
+ 
++        {/* Group size stepper — only shown for Group shots */}
++        {shotType === "group" && (
++          <div style={{
++            display: "flex", alignItems: "center", justifyContent: "center", gap: 14,
++            marginBottom: 20, background: "var(--cream-dark)", borderRadius: 14, padding: "10px 16px",
++          }}>
++            <span className="font-dm" style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>
++              How many people?
++            </span>
++            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
++              <button
++                onClick={() => adjustGroupSize(-1)}
++                disabled={groupSize <= GROUP_SIZE_MIN}
++                style={stepperBtnStyle}
++              >−</button>
++              <span className="font-playfair" style={{ fontSize: 18, color: "var(--text)", minWidth: 22, textAlign: "center" }}>
++                {groupSize}
++              </span>
++              <button
++                onClick={() => adjustGroupSize(1)}
++                disabled={groupSize >= GROUP_SIZE_MAX}
++                style={stepperBtnStyle}
++              >+</button>
++            </div>
++          </div>
++        )}
++
+         {/* Feeling Lucky */}
+         <button
+           className="btn-primary"
+@@ -112,3 +162,10 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
+     </div>
+   )
+ }
++
++const stepperBtnStyle = {
++  width: 28, height: 28, borderRadius: "50%",
++  border: "1.5px solid var(--pink-dark)", background: "white", color: "var(--pink-dark)",
++  fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
++  lineHeight: 1,
++}
+diff --git a/frontend-themed 5/src/data/poses.js b/frontend-themed 5/src/data/poses.js
+index e69d931..f88e09a 100644
+--- a/frontend-themed 5/src/data/poses.js	
++++ b/frontend-themed 5/src/data/poses.js	
+@@ -6,6 +6,12 @@
+ // the whole library stays lightweight (no image assets to ship) and
+ // easy to extend — add a new object here and it shows up everywhere.
+ //
++// Single/Couple poses have a fixed actor count (1 / 2). Group poses
++// are *templates*: the user tells us how many people are in the
++// shot, and generateGroupActors() lays out that many stick figures
++// in the chosen style (lineup / jump / huddle / pyramid) so every
++// group pose works for anywhere from 3 to 10 people.
++//
+ // Actor fields (all in a 0–100 x 0–100 canvas, mirrored for camera):
+ //   x, y      — hip anchor position
+ //   scale     — overall size multiplier
+@@ -20,6 +26,10 @@ export const POSE_TYPES = [
+   { id: "group",  label: "Group",   emoji: "👥", description: "Three or more" },
+ ]
+ 
++export const GROUP_SIZE_MIN = 3
++export const GROUP_SIZE_MAX = 10
++export const GROUP_SIZE_DEFAULT = 4
++
+ export const POSES = [
+   // ── Single ──────────────────────────────────────────────
+   {
+@@ -100,60 +110,114 @@ export const POSES = [
+     ],
+   },
+ 
+-  // ── Group ───────────────────────────────────────────────
++  // ── Group (templates — actors generated per group size) ──
+   {
+     id: "group-lineup",
+     type: "group",
+     label: "Classic Lineup",
+-    tip: "Everyone stands shoulder to shoulder",
+-    actors: [
+-      { x: 25, y: 64, scale: 0.9, armL: "down", armR: "shoulderR", legs: "stand", headTilt: -6 },
+-      { x: 45, y: 64, scale: 0.9, armL: "shoulderL", armR: "shoulderR", legs: "stand", headTilt: 0 },
+-      { x: 65, y: 64, scale: 0.9, armL: "shoulderL", armR: "shoulderR", legs: "stand", headTilt: 4 },
+-      { x: 85, y: 64, scale: 0.9, armL: "shoulderL", armR: "down", legs: "stand", headTilt: 6 },
+-    ],
++    tip: "Everyone stands shoulder to shoulder, arms linked",
++    style: "lineup",
+   },
+   {
+     id: "group-jump",
+     type: "group",
+     label: "Group Jump",
+     tip: "Everyone jumps together on 3",
+-    actors: [
+-      { x: 28, y: 55, scale: 0.85, armL: "up", armR: "up", legs: "kick", headTilt: -5 },
+-      { x: 50, y: 52, scale: 0.85, armL: "up", armR: "up", legs: "kick", headTilt: 0 },
+-      { x: 72, y: 55, scale: 0.85, armL: "up", armR: "up", legs: "kick", headTilt: 5 },
+-    ],
++    style: "jump",
+   },
+   {
+     id: "group-huddle",
+     type: "group",
+     label: "Huddle In",
+     tip: "Lean heads in close together",
+-    actors: [
+-      { x: 32, y: 60, scale: 0.85, armL: "hip", armR: "shoulderR", legs: "stand", headTilt: 10 },
+-      { x: 50, y: 58, scale: 0.85, armL: "shoulderL", armR: "shoulderR", legs: "stand", headTilt: -4 },
+-      { x: 68, y: 60, scale: 0.85, armL: "shoulderL", armR: "hip", legs: "stand", headTilt: -10 },
+-    ],
++    style: "huddle",
+   },
+   {
+     id: "group-pyramid",
+     type: "group",
+     label: "Staggered Pyramid",
+-    tip: "Front person crouches, back people stand tall",
+-    actors: [
+-      { x: 30, y: 70, scale: 0.75, armL: "hip", armR: "peace", legs: "sit", headTilt: -6 },
+-      { x: 50, y: 60, scale: 0.9,  armL: "down", armR: "up",   legs: "stand", headTilt: 0 },
+-      { x: 70, y: 70, scale: 0.75, armL: "peace", armR: "hip", legs: "sit", headTilt: 6 },
+-    ],
++    tip: "Alternate crouching and standing for a staggered look",
++    style: "pyramid",
+   },
+ ]
+ 
+-export function getPosesByType(type) {
+-  return POSES.filter((p) => p.type === type)
++// ── Group actor generation ───────────────────────────────────
++function evenlySpacedX(n, marginPct) {
++  if (n <= 1) return [50]
++  const start = marginPct
++  const end = 100 - marginPct
++  const step = (end - start) / (n - 1)
++  return Array.from({ length: n }, (_, i) => start + step * i)
++}
++
++function groupScale(n) {
++  // more people → smaller each figure, so the whole group still fits
++  return Math.max(0.5, Math.min(0.95, 0.98 - (n - 3) * 0.055))
++}
++
++export function clampGroupSize(n) {
++  return Math.max(GROUP_SIZE_MIN, Math.min(GROUP_SIZE_MAX, Math.round(n) || GROUP_SIZE_DEFAULT))
++}
++
++export function generateGroupActors(style, rawN) {
++  const n = clampGroupSize(rawN)
++  const margin = n > 6 ? 7 : 12
++  const xs = evenlySpacedX(n, margin)
++  const s = groupScale(n)
++  const mid = (n - 1) / 2
++
++  switch (style) {
++    case "lineup":
++      return xs.map((x, i) => ({
++        x, y: 64, scale: s,
++        armL: i === 0 ? "down" : "shoulderL",
++        armR: i === n - 1 ? "down" : "shoulderR",
++        legs: "stand",
++        headTilt: (i - mid) * 2.5,
++      }))
++
++    case "jump":
++      return xs.map((x, i) => ({
++        x, y: i % 2 === 0 ? 52 : 55, scale: s * 0.95,
++        armL: "up", armR: "up", legs: "kick",
++        headTilt: i % 2 === 0 ? -5 : 5,
++      }))
++
++    case "huddle":
++      return xs.map((x, i) => ({
++        x, y: 58 + Math.abs(i - mid) * 2.2, scale: s,
++        armL: i === 0 ? "hip" : "shoulderL",
++        armR: i === n - 1 ? "hip" : "shoulderR",
++        legs: "stand",
++        headTilt: (mid - i) * 4,
++      }))
++
++    case "pyramid":
++      return xs.map((x, i) => {
++        const front = i % 2 === 1
++        return {
++          x, y: front ? 72 : 60, scale: front ? s * 0.82 : s,
++          armL: front ? "peace" : "down",
++          armR: front ? "hip" : "up",
++          legs: front ? "sit" : "stand",
++          headTilt: (i - mid) * 3,
++        }
++      })
++
++    default:
++      return xs.map((x) => ({ x, y: 62, scale: s, armL: "down", armR: "down", legs: "stand", headTilt: 0 }))
++  }
++}
++
++export function getPosesByType(type, groupSize = GROUP_SIZE_DEFAULT) {
++  const pool = POSES.filter((p) => p.type === type)
++  if (type !== "group") return pool
++  const n = clampGroupSize(groupSize)
++  return pool.map((p) => ({ ...p, actors: generateGroupActors(p.style, n), groupSize: n }))
+ }
+ 
+-export function getRandomPose(type) {
+-  const pool = getPosesByType(type)
++export function getRandomPose(type, groupSize = GROUP_SIZE_DEFAULT) {
++  const pool = getPosesByType(type, groupSize)
+   if (pool.length === 0) return null
+   return pool[Math.floor(Math.random() * pool.length)]
+ }

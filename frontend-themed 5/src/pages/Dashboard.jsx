@@ -103,6 +103,22 @@ export default function Dashboard() {
             )}
             <button
               className="btn-secondary"
+              onClick={() => navigate("/frame-studio")}
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
+              <span style={{ fontSize: 16 }}>🖼️</span> Frame Studio
+            </button>
+            {captures.length >= 1 && (
+              <button
+                className="btn-secondary"
+                onClick={() => navigate("/sticker-export")}
+                style={{ display: "flex", alignItems: "center", gap: 8 }}
+              >
+                <span style={{ fontSize: 16 }}>🏷️</span> Sticker Pack
+              </button>
+            )}
+            <button
+              className="btn-secondary"
               onClick={() => navigate("/gesture-gif")}
               style={{ display: "flex", alignItems: "center", gap: 8 }}
             >

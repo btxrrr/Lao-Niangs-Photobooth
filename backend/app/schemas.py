@@ -74,11 +74,6 @@ class CaptureOut(BaseModel):
     file_size_bytes: Optional[int]
     caption: Optional[str]
     frame_style: Optional[str]
-    pose_id: Optional[str]
-    pose_label: Optional[str]
-    pose_group_size: Optional[str]
-    pose_theme: Optional[str]
-    pose_mode: Optional[str]
     is_flipbook: bool
     media_type: str
     created_at: datetime
