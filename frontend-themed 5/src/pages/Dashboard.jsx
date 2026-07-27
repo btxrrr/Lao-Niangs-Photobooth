@@ -92,15 +92,6 @@ export default function Dashboard() {
 
           {/* Buttons always rendered */}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {captures.length >= 2 && (
-              <button
-                className="btn-secondary"
-                onClick={() => navigate("/frames")}
-                style={{ display: "flex", alignItems: "center", gap: 8 }}
-              >
-                <span style={{ fontSize: 16 }}>🎞️</span> Create Frame
-              </button>
-            )}
             <button
               className="btn-secondary"
               onClick={() => navigate("/frame-studio")}
@@ -108,15 +99,13 @@ export default function Dashboard() {
             >
               <span style={{ fontSize: 16 }}>🖼️</span> Frame Studio
             </button>
-            {captures.length >= 1 && (
-              <button
-                className="btn-secondary"
-                onClick={() => navigate("/sticker-export")}
-                style={{ display: "flex", alignItems: "center", gap: 8 }}
-              >
-                <span style={{ fontSize: 16 }}>🏷️</span> Sticker Pack
-              </button>
-            )}
+            <button
+              className="btn-secondary"
+              onClick={() => navigate("/sticker-export")}
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
+              <span style={{ fontSize: 16 }}>🏷️</span> Sticker Pack
+            </button>
             <button
               className="btn-secondary"
               onClick={() => navigate("/gesture-gif")}
@@ -133,6 +122,10 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
+
+        <p className="font-dm" style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, marginBottom: 22 }}>
+          Frame layouts now live inside Frame Studio, so the dashboard only keeps the main entry points.
+        </p>
 
         {error && (
           <div style={{ background: "#FEE2E2", border: "1px solid #F87171", borderRadius: 12, padding: "12px 16px", marginBottom: 24, color: "#B91C1C", fontSize: 14 }}>
@@ -174,7 +167,7 @@ export default function Dashboard() {
 
         {!loading && captures.length === 1 && (
           <p className="font-dm" style={{ color: "rgba(255,255,255,0.45)", fontSize: 13, textAlign: "center", marginTop: 24 }}>
-            Take one more photo to unlock the Create Frame feature 🎞️
+            Take one more photo to unlock the frame builder 🎞️
           </p>
         )}
       </div>

@@ -13,6 +13,45 @@ export const CANVAS_PRESETS = [
   { id: "wide",   label: "Wide Banner", description: "Landscape memory board", w: 1280, h: 900, emoji: "🖼️" },
 ]
 
+export const STORY_LAYOUT_PRESETS = [
+  {
+    id: "2cut",
+    label: "2-Cut",
+    description: "Two equal splits",
+    emoji: "◫",
+    slots: 2,
+    grid: [
+      { x: 0, y: 0,   w: 1, h: 0.5 },
+      { x: 0, y: 0.5, w: 1, h: 0.5 },
+    ],
+  },
+  {
+    id: "3cut",
+    label: "3-Cut",
+    description: "Three vertical slices",
+    emoji: "☰",
+    slots: 3,
+    grid: [
+      { x: 0, y: 0,      w: 1, h: 0.333 },
+      { x: 0, y: 0.333,  w: 1, h: 0.333 },
+      { x: 0, y: 0.666,  w: 1, h: 0.334 },
+    ],
+  },
+  {
+    id: "4cut",
+    label: "4-Cut",
+    description: "Instagram-style 2×2",
+    emoji: "⊞",
+    slots: 4,
+    grid: [
+      { x: 0,   y: 0,   w: 0.5, h: 0.5 },
+      { x: 0.5, y: 0,   w: 0.5, h: 0.5 },
+      { x: 0,   y: 0.5, w: 0.5, h: 0.5 },
+      { x: 0.5, y: 0.5, w: 0.5, h: 0.5 },
+    ],
+  },
+]
+
 // ── Backgrounds ─────────────────────────────────────────────
 export const BACKGROUND_PRESETS = [
   { id: "cream",     label: "Cream",       colors: ["#FEFAF6", "#F5EDE3"] },

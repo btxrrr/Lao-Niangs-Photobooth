@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     upload_dir: str = "app/uploads"
     max_file_size_mb: int = 10
     allowed_origins: str = "http://localhost:3000,http://localhost:5173"
+    telegram_bot_token: str = ""
+    telegram_bot_username: str = ""
 
     @property
     def allowed_origins_list(self) -> list[str]:

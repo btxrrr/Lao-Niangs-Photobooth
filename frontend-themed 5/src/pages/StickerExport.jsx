@@ -1,83 +1,30 @@
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import JSZip from "jszip"
-import { listCaptures, getCaptureImageUrl } from "../api/api"
+import api, { listCaptures } from "../api/api"
 import AuthImage from "../components/AuthImage"
 
 // ─────────────────────────────────────────────────────────────
 // Feature 7 — Sticker Pack Export
 //
-// Users pick one or more photos/GIFs from their archive and export
-// them as messaging stickers:
-//   • Static photos → resized/padded to a standard 512×512 sticker
-//     canvas and exported as transparent-safe PNGs.
-//   • Animated GIFs → exported as-is (renamed for sticker use) since
-//     that's the native "animated sticker" format most messaging
-//     platforms (WhatsApp, Telegram, Discord, etc.) accept directly.
-// Everything is bundled into a single .zip via JSZip so users get
-// one download for the whole pack, plus a per-item quick download.
+// Users pick one or more photos/GIFs from their archive and send
+// them to the backend, which handles WhatsApp ZIP packaging and
+// Telegram sticker-set publishing.
 // ─────────────────────────────────────────────────────────────
-
-const STICKER_SIZE = 512
-
-async function fetchAuthBlob(captureId) {
-  const token = localStorage.getItem("token")
-  const res = await fetch(getCaptureImageUrl(captureId), {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!res.ok) throw new Error("Failed to fetch media")
-  return res.blob()
-}
-
-function blobToImage(blob) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob)
-    const img = new Image()
-    img.onload = () => { resolve(img); }
-    img.onerror = reject
-    img.src = url
-  })
-}
-
-// Render a static image into a square sticker canvas (contain-fit,
-// transparent padding) and return a PNG Blob.
-async function makeStaticSticker(blob) {
-  const img = await blobToImage(blob)
-  const canvas = document.createElement("canvas")
-  canvas.width = STICKER_SIZE
-  canvas.height = STICKER_SIZE
-  const ctx = canvas.getContext("2d")
-  ctx.clearRect(0, 0, STICKER_SIZE, STICKER_SIZE)
-
-  const scale = Math.min(STICKER_SIZE / img.width, STICKER_SIZE / img.height)
-  const w = img.width * scale
-  const h = img.height * scale
-  const x = (STICKER_SIZE - w) / 2
-  const y = (STICKER_SIZE - h) / 2
-  ctx.drawImage(img, x, y, w, h)
-
-  return new Promise((resolve) => canvas.toBlob(resolve, "image/png"))
-}
-
-function isAnimated(capture) {
-  return capture.media_type === "gif" || (capture.content_type || "").includes("gif")
-}
-
-function slugify(text, fallback) {
-  const base = (text || fallback || "sticker").toString().trim().toLowerCase()
-  return base.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || fallback
-}
 
 export default function StickerExport() {
   const navigate = useNavigate()
 
   const [captures, setCaptures] = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [error,    setError]    = useState("")
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
   const [selected, setSelected] = useState(new Set())
+  const [platform, setPlatform] = useState("whatsapp")
+  const [packTitle, setPackTitle] = useState("Lao Niangs Sticker Pack")
+  const [telegramUsername, setTelegramUsername] = useState("")
   const [exporting, setExporting] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [exportMsg, setExportMsg] = useState("")
-  const [exportedZipUrl, setExportedZipUrl] = useState(null)
+  const [exportResult, setExportResult] = useState(null)
 
   useEffect(() => {
     listCaptures()
@@ -87,7 +34,7 @@ export default function StickerExport() {
   }, [])
 
   const toggleSelect = (id) => {
-    setExportedZipUrl(null)
+    setExportResult(null)
     setSelected((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
@@ -97,64 +44,73 @@ export default function StickerExport() {
   }
 
   const selectAll = () => setSelected(new Set(captures.map((c) => c.id)))
-  const clearAll  = () => setSelected(new Set())
+  const clearAll = () => setSelected(new Set())
 
   const handleExport = useCallback(async () => {
     if (selected.size === 0) return
     setExporting(true)
-    setExportedZipUrl(null)
-    setExportMsg("Preparing sticker pack…")
+    setExportResult(null)
+    setExportMsg(platform === "telegram" ? "Publishing to Telegram…" : "Preparing WhatsApp ZIP…")
 
     try {
-      const zip = new JSZip()
-      const chosen = captures.filter((c) => selected.has(c.id))
-
-      for (let i = 0; i < chosen.length; i++) {
-        const c = chosen[i]
-        setExportMsg(`Processing ${i + 1} of ${chosen.length}…`)
-        const blob = await fetchAuthBlob(c.id)
-        const name = slugify(c.caption, `sticker-${c.id}`)
-
-        if (isAnimated(c)) {
-          zip.file(`${name}.gif`, blob)
-        } else {
-          const stickerBlob = await makeStaticSticker(blob)
-          zip.file(`${name}.png`, stickerBlob)
-        }
+      const payload = {
+        platform,
+        title: packTitle,
+        capture_ids: Array.from(selected),
       }
 
-      setExportMsg("Zipping up…")
-      const zipBlob = await zip.generateAsync({ type: "blob" })
-      const url = URL.createObjectURL(zipBlob)
-      setExportedZipUrl(url)
+      if (platform === "telegram" && telegramUsername.trim()) {
+        // Send username - backend will handle conversion if needed
+        payload.telegram_username = telegramUsername.replace(/^@/, "") // Remove @ if user added it
+      }
+
+      const response = await api.post("/stickers/export", payload)
+      const data = response.data
+      if (data.artifact_url) {
+        setExportResult({
+          type: "download",
+          artifactPath: data.artifact_url,
+          downloadName: data.download_name || "sticker-pack.zip",
+          message: data.message,
+        })
+      } else if (data.telegram_sticker_set_url) {
+        setExportResult({
+          type: "telegram",
+          url: data.telegram_sticker_set_url,
+          downloadName: data.telegram_sticker_set_name,
+          message: data.message,
+        })
+      }
       setExportMsg("")
     } catch (err) {
-      setError("Some stickers could not be exported. Please try again.")
+      setError(err?.response?.data?.detail || "Some stickers could not be exported. Please try again.")
       setExportMsg("")
     } finally {
       setExporting(false)
     }
-  }, [selected, captures])
+  }, [platform, selected, packTitle, telegramUsername])
 
-  const handleSingleDownload = useCallback(async (capture) => {
+  const handleDownloadArtifact = useCallback(async () => {
+    if (!exportResult?.artifactPath) return
+
+    setDownloading(true)
     try {
-      const blob = await fetchAuthBlob(capture.id)
-      const name = slugify(capture.caption, `sticker-${capture.id}`)
-      let outBlob = blob, ext = "gif"
-      if (!isAnimated(capture)) {
-        outBlob = await makeStaticSticker(blob)
-        ext = "png"
-      }
-      const url = URL.createObjectURL(outBlob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `${name}.${ext}`
-      a.click()
-      URL.revokeObjectURL(url)
-    } catch {
-      alert("Could not export this sticker.")
+      const response = await api.get(exportResult.artifactPath, { responseType: "blob" })
+      const blob = new Blob([response.data], { type: response.headers["content-type"] || "application/zip" })
+      const objectUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = objectUrl
+      link.download = exportResult.downloadName || "sticker-pack.zip"
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(objectUrl)
+    } catch (err) {
+      setError(err?.response?.data?.detail || "Could not download the sticker pack. Please try again.")
+    } finally {
+      setDownloading(false)
     }
-  }, [])
+  }, [exportResult])
 
   return (
     <div className="denim-bg" style={{ minHeight: "100vh", paddingBottom: 60 }}>
@@ -178,13 +134,88 @@ export default function StickerExport() {
           <div>
             <h2 className="font-playfair" style={{ fontSize: 26, color: "white", marginBottom: 6 }}>Pick memories to turn into stickers</h2>
             <p className="font-dm" style={{ color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
-              Photos become {STICKER_SIZE}×{STICKER_SIZE} sticker images. GIFs export as animated stickers.
+              Select a platform, then let the backend build the pack for WhatsApp or publish it to Telegram.
             </p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button className="btn-secondary" onClick={selectAll} style={{ fontSize: 13 }}>Select all</button>
             <button className="btn-secondary" onClick={clearAll} style={{ fontSize: 13 }}>Clear</button>
           </div>
+        </div>
+
+        <div className="glass-card" style={{ padding: 18, marginBottom: 24, display: "grid", gap: 14 }}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <label className="font-dm" style={{ color: "var(--text)", fontSize: 13, fontWeight: 700 }}>Sticker pack title</label>
+            <input
+              value={packTitle}
+              onChange={(e) => setPackTitle(e.target.value)}
+              placeholder="Lao Niangs Sticker Pack"
+              style={{ width: "100%", borderRadius: 12, border: "1px solid rgba(0,0,0,0.12)", padding: "12px 14px", fontSize: 14 }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <button
+              className={platform === "whatsapp" ? "btn-primary" : "btn-secondary"}
+              onClick={() => { setPlatform("whatsapp"); setExportResult(null) }}
+              style={{ fontSize: 13 }}
+            >
+              WhatsApp ZIP
+            </button>
+            <button
+              className={platform === "telegram" ? "btn-primary" : "btn-secondary"}
+              onClick={() => { setPlatform("telegram"); setExportResult(null) }}
+              style={{ fontSize: 13 }}
+            >
+              Telegram publish
+            </button>
+          </div>
+
+          {/* Platform-specific instructions */}
+          <div style={{ background: "rgba(244,167,185,0.08)", border: "1px solid rgba(244,167,185,0.25)", borderRadius: 12, padding: 14 }}>
+            {platform === "whatsapp" ? (
+              <div>
+                <p className="font-dm" style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>
+                  📦 How to add stickers to WhatsApp:
+                </p>
+                <ol className="font-dm" style={{ fontSize: 12, color: "var(--text-light)", lineHeight: 1.6, paddingLeft: 20 }}>
+                  <li>Download the ZIP file</li>
+                  <li>Use a sticker maker app like "Sticker Maker" or "Sticker.ly"</li>
+                  <li>Import the files from the downloaded ZIP</li>
+                  <li>Add to WhatsApp as a custom sticker pack</li>
+                </ol>
+              </div>
+            ) : (
+              <div>
+                <p className="font-dm" style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>
+                  💬 How to add stickers to Telegram:
+                </p>
+                <p className="font-dm" style={{ fontSize: 12, color: "var(--text-light)", lineHeight: 1.6, marginBottom: 8 }}>
+                  Click "Publish to Telegram" and you'll be taken to the Telegram sticker set directly. From there, you can add it to your account or share with others.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {platform === "telegram" && (
+            <div>
+              <p className="font-dm" style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>
+                💬 How to add stickers to Telegram:
+              </p>
+              <div style={{ display: "grid", gap: 6, marginBottom: 8 }}>
+                <label className="font-dm" style={{ color: "var(--text)", fontSize: 13, fontWeight: 700 }}>Telegram username (optional)</label>
+                <input
+                  value={telegramUsername}
+                  onChange={(e) => setTelegramUsername(e.target.value)}
+                  placeholder="@yourname or yourname"
+                  style={{ width: "100%", borderRadius: 12, border: "1px solid rgba(0,0,0,0.12)", padding: "12px 14px", fontSize: 14 }}
+                />
+              </div>
+              <p className="font-dm" style={{ fontSize: 12, color: "var(--text-light)", lineHeight: 1.6 }}>
+                Enter your Telegram username (with or without the @). Click "Publish to Telegram" and the sticker pack will be added to your sticker collection automatically.
+              </p>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -212,7 +243,6 @@ export default function StickerExport() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 18, marginBottom: 32 }}>
             {captures.map((c) => {
               const isSel = selected.has(c.id)
-              const animated = isAnimated(c)
               return (
                 <div
                   key={c.id}
@@ -238,22 +268,6 @@ export default function StickerExport() {
                   }}>
                     {isSel ? "✓" : ""}
                   </div>
-                  {animated && (
-                    <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(61,52,80,0.85)", color: "white", borderRadius: 999, padding: "3px 8px", fontSize: 10, letterSpacing: "0.06em" }}>
-                      GIF
-                    </div>
-                  )}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleSingleDownload(c) }}
-                    title="Quick export this one"
-                    style={{
-                      position: "absolute", bottom: 8, right: 8,
-                      background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%",
-                      width: 26, height: 26, fontSize: 13, cursor: "pointer",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-                    }}
-                  >⬇</button>
                 </div>
               )
             })}
@@ -271,22 +285,34 @@ export default function StickerExport() {
               )}
             </div>
 
-            {exportedZipUrl ? (
-              <a
-                href={exportedZipUrl}
-                download={`sticker-pack-${Date.now()}.zip`}
-                className="btn-primary"
-                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}
-              >
-                ⬇️ Download sticker-pack.zip
-              </a>
+            {exportResult ? (
+              exportResult.type === "download" ? (
+                <button
+                  onClick={handleDownloadArtifact}
+                  disabled={downloading}
+                  className="btn-primary"
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+                >
+                  {downloading ? "Downloading…" : "⬇️ Download sticker-pack.zip"}
+                </button>
+              ) : (
+                <a
+                  href={exportResult.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-primary"
+                  style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}
+                >
+                  Open Telegram sticker pack
+                </a>
+              )
             ) : (
               <button
                 className="btn-primary"
                 onClick={handleExport}
                 disabled={selected.size === 0 || exporting}
               >
-                {exporting ? "Exporting…" : `Export ${selected.size || ""} sticker${selected.size === 1 ? "" : "s"} 🏷️`}
+                {exporting ? "Exporting…" : `${platform === "telegram" ? "Publish" : "Export"} ${selected.size || ""} sticker${selected.size === 1 ? "" : "s"} 🏷️`}
               </button>
             )}
           </div>
