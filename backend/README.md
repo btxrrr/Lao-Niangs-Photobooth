@@ -65,6 +65,7 @@ Deployment notes:
 - Do not commit .env.
 - Commit .env.example only.
 - Configure real values in your host's environment variable dashboard.
+- On Render, pin Python to 3.12.11 using backend/runtime.txt so av and pillow install from wheels instead of building from source.
 
 ## Endpoint Summary
 
