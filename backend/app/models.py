@@ -30,11 +30,6 @@ class Capture(Base):
     file_size_bytes   = Column(Integer, nullable=True)
     caption           = Column(Text, nullable=True)
     frame_style       = Column(String, nullable=True)
-    pose_id           = Column(String, nullable=True)
-    pose_label        = Column(String, nullable=True)
-    pose_group_size   = Column(String, nullable=True)
-    pose_theme        = Column(String, nullable=True)
-    pose_mode         = Column(String, nullable=True)
     is_flipbook       = Column(Boolean, default=False)
     media_type        = Column(String, default="photo")   # "photo" | "gif"
     created_at        = Column(DateTime(timezone=True), server_default=func.now())

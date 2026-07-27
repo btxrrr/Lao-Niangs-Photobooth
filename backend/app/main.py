@@ -78,10 +78,6 @@ def on_startup():
                 connection.execute(
                     text("UPDATE captures SET media_type = 'photo' WHERE media_type IS NULL")
                 )
-        for column_name in ["pose_id", "pose_label", "pose_group_size", "pose_theme", "pose_mode"]:
-            if column_name not in capture_columns:
-                with engine.begin() as connection:
-                    connection.execute(text(f"ALTER TABLE captures ADD COLUMN {column_name} VARCHAR"))
 
 # ── Health check ──────────────────────────────────────────────
 @app.get("/health", tags=["health"])

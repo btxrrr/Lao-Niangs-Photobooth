@@ -1,0 +1,120 @@
+diff --git a/frontend-themed 5/src/components/PoseLibraryModal.jsx b/frontend-themed 5/src/components/PoseLibraryModal.jsx
+index 8fd69a9..f113cca 100644
+--- a/frontend-themed 5/src/components/PoseLibraryModal.jsx	
++++ b/frontend-themed 5/src/components/PoseLibraryModal.jsx	
+@@ -140,7 +140,7 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
+               onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--pink)")}
+               onMouseLeave={(e) => (e.currentTarget.style.borderColor = "transparent")}
+             >
+-              <div style={{ aspectRatio: "1", padding: 10 }}>
++              <div style={{ aspectRatio: "16 / 9", padding: 10 }}>
+                 <PoseSilhouette pose={pose} opacity={0.95} />
+               </div>
+               <div style={{ background: "white", padding: "8px 10px" }}>
+diff --git a/frontend-themed 5/src/components/PoseSilhouette.jsx b/frontend-themed 5/src/components/PoseSilhouette.jsx
+index e3907b7..44b4129 100644
+--- a/frontend-themed 5/src/components/PoseSilhouette.jsx	
++++ b/frontend-themed 5/src/components/PoseSilhouette.jsx	
+@@ -3,8 +3,21 @@
+ // as a lightweight inline SVG. Used both as small thumbnails in the
+ // pose library grid and as the big semi-transparent overlay shown
+ // on top of the live webcam preview.
++//
++// The internal canvas is widescreen (matches the webcam's ~16:9
++// frame) rather than square. Each actor's x position is still
++// authored as a 0–100 "percentage of frame width" in data/poses.js,
++// so poses.js never needs to know about the real aspect ratio — it
++// gets remapped onto the wide canvas here. That's what keeps a
++// group pose spread across the *actual* width people will stand in,
++// instead of being squeezed into a square letterboxed in the middle
++// of a landscape video, which is what made the overlay feel
++// misaligned with real bodies before.
+ // ─────────────────────────────────────────────────────────────
+ 
++const VIEWBOX_W = 178   // ≈ 16:9 when paired with VIEWBOX_H
++const VIEWBOX_H = 100
++
+ function armTarget(side, variant, s) {
+   // side: 1 for right arm, -1 for left arm (mirrored)
+   const sign = side
+@@ -36,7 +49,12 @@ function legTargets(variant, s) {
+ 
+ function Actor({ x, y, scale, armL, armR, legs, headTilt = 0, color = "#FFFFFF" }) {
+   const s = scale
+-  const shoulderY = y - 22 * s
++  // `x` arrives as a 0–100 percentage of frame width — remap it onto
++  // the actual (wider) viewBox so spacing matches the real frame.
++  const cx = (x / 100) * VIEWBOX_W
++  const cy = y
++
++  const shoulderY = cy - 22 * s
+   const headY = shoulderY - 10 * s
+   const headR = 6 * s
+ 
+@@ -47,25 +65,25 @@ function Actor({ x, y, scale, armL, armR, legs, headTilt = 0, color = "#FFFFFF"
+   const strokeW = Math.max(2.4, 4.2 * s)
+ 
+   return (
+-    <g style={{ transformOrigin: `${x}px ${y}px` }}>
++    <g style={{ transformOrigin: `${cx}px ${cy}px` }}>
+       {/* legs */}
+-      <line x1={x} y1={y} x2={x + lLeg.x} y2={y + lLeg.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
+-      <line x1={x} y1={y} x2={x + rLeg.x} y2={y + rLeg.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      <line x1={cx} y1={cy} x2={cx + lLeg.x} y2={cy + lLeg.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      <line x1={cx} y1={cy} x2={cx + rLeg.x} y2={cy + rLeg.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
+       {/* torso */}
+-      <line x1={x} y1={shoulderY} x2={x} y2={y} stroke={color} strokeWidth={strokeW * 1.35} strokeLinecap="round" />
++      <line x1={cx} y1={shoulderY} x2={cx} y2={cy} stroke={color} strokeWidth={strokeW * 1.35} strokeLinecap="round" />
+       {/* arms */}
+-      <line x1={x} y1={shoulderY + 2 * s} x2={x + lArm.x} y2={shoulderY + 2 * s + lArm.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
+-      <line x1={x} y1={shoulderY + 2 * s} x2={x + rArm.x} y2={shoulderY + 2 * s + rArm.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      <line x1={cx} y1={shoulderY + 2 * s} x2={cx + lArm.x} y2={shoulderY + 2 * s + lArm.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      <line x1={cx} y1={shoulderY + 2 * s} x2={cx + rArm.x} y2={shoulderY + 2 * s + rArm.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
+       {/* hands (little dots so gestures like peace/wave/heart read clearly) */}
+-      <circle cx={x + lArm.x} cy={shoulderY + 2 * s + lArm.y} r={strokeW * 0.55} fill={color} />
+-      <circle cx={x + rArm.x} cy={shoulderY + 2 * s + rArm.y} r={strokeW * 0.55} fill={color} />
++      <circle cx={cx + lArm.x} cy={shoulderY + 2 * s + lArm.y} r={strokeW * 0.55} fill={color} />
++      <circle cx={cx + rArm.x} cy={shoulderY + 2 * s + rArm.y} r={strokeW * 0.55} fill={color} />
+       {/* head */}
+       <circle
+-        cx={x}
++        cx={cx}
+         cy={headY}
+         r={headR}
+         fill={color}
+-        style={{ transform: `rotate(${headTilt}deg)`, transformOrigin: `${x}px ${headY}px` }}
++        style={{ transform: `rotate(${headTilt}deg)`, transformOrigin: `${cx}px ${headY}px` }}
+       />
+     </g>
+   )
+@@ -75,7 +93,7 @@ export default function PoseSilhouette({ pose, color = "#FFFFFF", opacity = 0.85
+   if (!pose) return null
+   return (
+     <svg
+-      viewBox="0 0 100 100"
++      viewBox={`0 0 ${VIEWBOX_W} ${VIEWBOX_H}`}
+       preserveAspectRatio="xMidYMax meet"
+       style={{ display: "block", width: "100%", height: "100%", opacity, ...style }}
+     >
+diff --git a/frontend-themed 5/src/pages/Photobooth.jsx b/frontend-themed 5/src/pages/Photobooth.jsx
+index 2ea1c65..0d2579f 100644
+--- a/frontend-themed 5/src/pages/Photobooth.jsx	
++++ b/frontend-themed 5/src/pages/Photobooth.jsx	
+@@ -181,10 +181,14 @@ export default function Photobooth() {
+                 onUserMedia={handleUserMedia}
+               />
+ 
+-              {/* Pose overlay — purely a visual guide, not validated */}
++              {/* Pose overlay — purely a visual guide, not validated.
++                  Sized to the webcam's own aspect ratio (not a fixed
++                  70% box) so the silhouette actually lines up with
++                  where people stand across the real frame, whether
++                  it's a single pose or a wide group lineup. */}
+               {selectedPose && countdown === null && (
+-                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+-                  <div style={{ width: "70%", height: "92%" }}>
++                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", display: "flex", alignItems: "flex-end", justifyContent: "center", padding: "0 2%" }}>
++                  <div style={{ width: "100%", maxHeight: "94%", aspectRatio: "16 / 9" }}>
+                     <PoseSilhouette pose={selectedPose} opacity={0.45} />
+                   </div>
+                 </div>
