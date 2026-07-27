@@ -9,6 +9,8 @@ import Photobooth     from "./pages/Photobooth"
 import Frames         from "./pages/Frames"
 import ProtectedRoute from "./components/ProtectedRoute"
 import GestureGif from "./pages/GestureGif"
+import FrameStudio from "./pages/FrameStudio"
+import StickerExport from "./pages/StickerExport"
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
         <Route path="/photobooth" element={<ProtectedRoute><Photobooth /></ProtectedRoute>} />
         <Route path="/frames"     element={<ProtectedRoute><Frames /></ProtectedRoute>} />
         <Route path="/gesture-gif" element={<ProtectedRoute><GestureGif /></ProtectedRoute>} />
+        <Route path="/frame-studio" element={<ProtectedRoute><FrameStudio /></ProtectedRoute>} />
+        <Route path="/sticker-export" element={<ProtectedRoute><StickerExport /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

@@ -9,7 +9,7 @@ from sqlalchemy import inspect, text
 
 from app.config import get_settings
 from app.database import Base, engine
-from app.routes import auth_routes, capture_routes, gif_routes
+from app.routes import auth_routes, capture_routes, gif_routes, sticker_routes
 
 settings = get_settings()
 
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(auth_routes.router)
 app.include_router(capture_routes.router)
 app.include_router(gif_routes.router)
+app.include_router(sticker_routes.router)
 
 # ── Swagger: plain Bearer token input ─────────────────────────
 def custom_openapi():
@@ -78,10 +79,6 @@ def on_startup():
                 connection.execute(
                     text("UPDATE captures SET media_type = 'photo' WHERE media_type IS NULL")
                 )
-        for column_name in ["pose_id", "pose_label", "pose_group_size", "pose_theme", "pose_mode"]:
-            if column_name not in capture_columns:
-                with engine.begin() as connection:
-                    connection.execute(text(f"ALTER TABLE captures ADD COLUMN {column_name} VARCHAR"))
 
 # ── Health check ──────────────────────────────────────────────
 @app.get("/health", tags=["health"])

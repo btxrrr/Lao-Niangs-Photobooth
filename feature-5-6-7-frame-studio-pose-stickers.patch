@@ -1,0 +1,2048 @@
+diff --git a/frontend-themed 5/package-lock.json b/frontend-themed 5/package-lock.json
+index 1bb2b81..bcd0651 100644
+--- a/frontend-themed 5/package-lock.json	
++++ b/frontend-themed 5/package-lock.json	
+@@ -10,6 +10,7 @@
+       "dependencies": {
+         "@mediapipe/tasks-vision": "^0.10.35",
+         "axios": "^1.6.0",
++        "jszip": "^3.10.1",
+         "react": "^18.2.0",
+         "react-dom": "^18.2.0",
+         "react-router-dom": "^6.22.0",
+@@ -1481,6 +1482,12 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/core-util-is": {
++      "version": "1.0.3",
++      "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.3.tgz",
++      "integrity": "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==",
++      "license": "MIT"
++    },
+     "node_modules/cssesc": {
+       "version": "3.0.0",
+       "resolved": "https://registry.npmjs.org/cssesc/-/cssesc-3.0.0.tgz",
+@@ -1886,6 +1893,18 @@
+         "node": ">= 6"
+       }
+     },
++    "node_modules/immediate": {
++      "version": "3.0.6",
++      "resolved": "https://registry.npmjs.org/immediate/-/immediate-3.0.6.tgz",
++      "integrity": "sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==",
++      "license": "MIT"
++    },
++    "node_modules/inherits": {
++      "version": "2.0.4",
++      "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
++      "integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
++      "license": "ISC"
++    },
+     "node_modules/is-binary-path": {
+       "version": "2.1.0",
+       "resolved": "https://registry.npmjs.org/is-binary-path/-/is-binary-path-2.1.0.tgz",
+@@ -1948,6 +1967,12 @@
+         "node": ">=0.12.0"
+       }
+     },
++    "node_modules/isarray": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz",
++      "integrity": "sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==",
++      "license": "MIT"
++    },
+     "node_modules/jiti": {
+       "version": "1.21.7",
+       "resolved": "https://registry.npmjs.org/jiti/-/jiti-1.21.7.tgz",
+@@ -1990,6 +2015,27 @@
+         "node": ">=6"
+       }
+     },
++    "node_modules/jszip": {
++      "version": "3.10.1",
++      "resolved": "https://registry.npmjs.org/jszip/-/jszip-3.10.1.tgz",
++      "integrity": "sha512-xXDvecyTpGLrqFrvkrUSoxxfJI5AH7U8zxxtVclpsUtMCq4JQ290LY8AW5c7Ggnr/Y/oK+bQMbqK2qmtk3pN4g==",
++      "license": "(MIT OR GPL-3.0-or-later)",
++      "dependencies": {
++        "lie": "~3.3.0",
++        "pako": "~1.0.2",
++        "readable-stream": "~2.3.6",
++        "setimmediate": "^1.0.5"
++      }
++    },
++    "node_modules/lie": {
++      "version": "3.3.0",
++      "resolved": "https://registry.npmjs.org/lie/-/lie-3.3.0.tgz",
++      "integrity": "sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==",
++      "license": "MIT",
++      "dependencies": {
++        "immediate": "~3.0.5"
++      }
++    },
+     "node_modules/lilconfig": {
+       "version": "3.1.3",
+       "resolved": "https://registry.npmjs.org/lilconfig/-/lilconfig-3.1.3.tgz",
+@@ -2163,6 +2209,12 @@
+         "node": ">= 6"
+       }
+     },
++    "node_modules/pako": {
++      "version": "1.0.11",
++      "resolved": "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz",
++      "integrity": "sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==",
++      "license": "(MIT AND Zlib)"
++    },
+     "node_modules/path-parse": {
+       "version": "1.0.7",
+       "resolved": "https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz",
+@@ -2373,6 +2425,12 @@
+       "dev": true,
+       "license": "MIT"
+     },
++    "node_modules/process-nextick-args": {
++      "version": "2.0.1",
++      "resolved": "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz",
++      "integrity": "sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==",
++      "license": "MIT"
++    },
+     "node_modules/proxy-from-env": {
+       "version": "2.1.0",
+       "resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-2.1.0.tgz",
+@@ -2490,6 +2548,21 @@
+         "pify": "^2.3.0"
+       }
+     },
++    "node_modules/readable-stream": {
++      "version": "2.3.8",
++      "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz",
++      "integrity": "sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==",
++      "license": "MIT",
++      "dependencies": {
++        "core-util-is": "~1.0.0",
++        "inherits": "~2.0.3",
++        "isarray": "~1.0.0",
++        "process-nextick-args": "~2.0.0",
++        "safe-buffer": "~5.1.1",
++        "string_decoder": "~1.1.1",
++        "util-deprecate": "~1.0.1"
++      }
++    },
+     "node_modules/readdirp": {
+       "version": "3.6.0",
+       "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-3.6.0.tgz",
+@@ -2605,6 +2678,12 @@
+         "queue-microtask": "^1.2.2"
+       }
+     },
++    "node_modules/safe-buffer": {
++      "version": "5.1.2",
++      "resolved": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz",
++      "integrity": "sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==",
++      "license": "MIT"
++    },
+     "node_modules/scheduler": {
+       "version": "0.23.2",
+       "resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.23.2.tgz",
+@@ -2624,6 +2703,12 @@
+         "semver": "bin/semver.js"
+       }
+     },
++    "node_modules/setimmediate": {
++      "version": "1.0.5",
++      "resolved": "https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz",
++      "integrity": "sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==",
++      "license": "MIT"
++    },
+     "node_modules/source-map-js": {
+       "version": "1.2.1",
+       "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz",
+@@ -2634,6 +2719,15 @@
+         "node": ">=0.10.0"
+       }
+     },
++    "node_modules/string_decoder": {
++      "version": "1.1.1",
++      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz",
++      "integrity": "sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==",
++      "license": "MIT",
++      "dependencies": {
++        "safe-buffer": "~5.1.0"
++      }
++    },
+     "node_modules/sucrase": {
+       "version": "3.35.1",
+       "resolved": "https://registry.npmjs.org/sucrase/-/sucrase-3.35.1.tgz",
+@@ -2834,7 +2928,6 @@
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+       "integrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
+-      "dev": true,
+       "license": "MIT"
+     },
+     "node_modules/vite": {
+diff --git a/frontend-themed 5/package.json b/frontend-themed 5/package.json
+index c0e3116..a60e3d8 100644
+--- a/frontend-themed 5/package.json	
++++ b/frontend-themed 5/package.json	
+@@ -11,6 +11,7 @@
+   "dependencies": {
+     "@mediapipe/tasks-vision": "^0.10.35",
+     "axios": "^1.6.0",
++    "jszip": "^3.10.1",
+     "react": "^18.2.0",
+     "react-dom": "^18.2.0",
+     "react-router-dom": "^6.22.0",
+diff --git a/frontend-themed 5/src/App.jsx b/frontend-themed 5/src/App.jsx
+index b3dd57f..1e8a7f1 100644
+--- a/frontend-themed 5/src/App.jsx	
++++ b/frontend-themed 5/src/App.jsx	
+@@ -9,6 +9,8 @@ import Photobooth     from "./pages/Photobooth"
+ import Frames         from "./pages/Frames"
+ import ProtectedRoute from "./components/ProtectedRoute"
+ import GestureGif from "./pages/GestureGif"
++import FrameStudio from "./pages/FrameStudio"
++import StickerExport from "./pages/StickerExport"
+ 
+ export default function App() {
+   return (
+@@ -23,6 +25,8 @@ export default function App() {
+         <Route path="/photobooth" element={<ProtectedRoute><Photobooth /></ProtectedRoute>} />
+         <Route path="/frames"     element={<ProtectedRoute><Frames /></ProtectedRoute>} />
+         <Route path="/gesture-gif" element={<ProtectedRoute><GestureGif /></ProtectedRoute>} />
++        <Route path="/frame-studio" element={<ProtectedRoute><FrameStudio /></ProtectedRoute>} />
++        <Route path="/sticker-export" element={<ProtectedRoute><StickerExport /></ProtectedRoute>} />
+       </Routes>
+     </BrowserRouter>
+   )
+diff --git a/frontend-themed 5/src/components/PoseLibraryModal.jsx b/frontend-themed 5/src/components/PoseLibraryModal.jsx
+new file mode 100644
+index 0000000..283b6ae
+--- /dev/null
++++ b/frontend-themed 5/src/components/PoseLibraryModal.jsx	
+@@ -0,0 +1,114 @@
++import { useState, useMemo } from "react"
++import { POSE_TYPES, getPosesByType, getRandomPose } from "../data/poses"
++import PoseSilhouette from "./PoseSilhouette"
++
++// ─────────────────────────────────────────────────────────────
++// PoseLibraryModal — Feature 6: Pose Assistant
++//
++// Two interaction modes live here:
++//   • Pose Library Mode  — pick a shot type, browse filtered poses,
++//                           tap one to select it.
++//   • Pose Roulette Mode — "Feeling Lucky" instantly picks a random
++//                           pose from the same filtered list.
++//
++// onSelect(pose | null) is called when the user confirms a pose or
++// explicitly skips ("No pose, thanks").
++// ─────────────────────────────────────────────────────────────
++export default function PoseLibraryModal({ onSelect, onClose }) {
++  const [shotType, setShotType] = useState("single")
++  const poses = useMemo(() => getPosesByType(shotType), [shotType])
++
++  const handleLucky = () => {
++    const pose = getRandomPose(shotType)
++    if (pose) onSelect(pose)
++  }
++
++  return (
++    <div
++      style={{
++        position: "fixed", inset: 0, zIndex: 50,
++        background: "rgba(61,52,80,0.55)", backdropFilter: "blur(4px)",
++        display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
++      }}
++      onClick={onClose}
++    >
++      <div
++        className="glass-card"
++        style={{ width: "100%", maxWidth: 640, maxHeight: "85vh", overflowY: "auto", padding: 28 }}
++        onClick={(e) => e.stopPropagation()}
++      >
++        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
++          <h2 className="font-playfair" style={{ fontSize: 24, color: "var(--text)" }}>Pose Assistant 🕺</h2>
++          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-light)" }}>✕</button>
++        </div>
++        <p className="font-dm" style={{ fontSize: 13, color: "var(--text-light)", marginBottom: 20 }}>
++          Pick a shot type, then browse poses or let us surprise you.
++        </p>
++
++        {/* Shot type selector */}
++        <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
++          {POSE_TYPES.map((t) => (
++            <button
++              key={t.id}
++              onClick={() => setShotType(t.id)}
++              style={{
++                flex: 1, padding: "10px 8px", borderRadius: 14,
++                border: "1.5px solid",
++                borderColor: shotType === t.id ? "var(--pink-dark)" : "rgba(244,167,185,0.35)",
++                background: shotType === t.id ? "var(--pink-light)" : "white",
++                color: shotType === t.id ? "var(--pink-dark)" : "var(--text-light)",
++                fontFamily: "DM Sans, sans-serif", fontWeight: 600, fontSize: 13,
++                cursor: "pointer", transition: "all 0.2s",
++              }}
++            >
++              <div style={{ fontSize: 20, marginBottom: 2 }}>{t.emoji}</div>
++              {t.label}
++            </button>
++          ))}
++        </div>
++
++        {/* Feeling Lucky */}
++        <button
++          className="btn-primary"
++          onClick={handleLucky}
++          style={{ width: "100%", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
++        >
++          🎲 Feeling Lucky — surprise me
++        </button>
++
++        {/* Pose grid */}
++        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 14 }}>
++          {poses.map((pose) => (
++            <button
++              key={pose.id}
++              onClick={() => onSelect(pose)}
++              style={{
++                background: "var(--denim)", borderRadius: 14, border: "2px solid transparent",
++                padding: 0, cursor: "pointer", overflow: "hidden", transition: "border-color 0.2s",
++                display: "flex", flexDirection: "column",
++              }}
++              onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--pink)")}
++              onMouseLeave={(e) => (e.currentTarget.style.borderColor = "transparent")}
++            >
++              <div style={{ aspectRatio: "1", padding: 10 }}>
++                <PoseSilhouette pose={pose} opacity={0.95} />
++              </div>
++              <div style={{ background: "white", padding: "8px 10px" }}>
++                <p className="font-dm" style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{pose.label}</p>
++                <p className="font-dm" style={{ fontSize: 10.5, color: "var(--text-light)", marginTop: 2 }}>{pose.tip}</p>
++              </div>
++            </button>
++          ))}
++        </div>
++
++        <button
++          className="btn-secondary"
++          onClick={() => onSelect(null)}
++          style={{ width: "100%", marginTop: 20, fontSize: 13 }}
++        >
++          No pose, thanks — just take the photo
++        </button>
++      </div>
++    </div>
++  )
++}
+diff --git a/frontend-themed 5/src/components/PoseSilhouette.jsx b/frontend-themed 5/src/components/PoseSilhouette.jsx
+new file mode 100644
+index 0000000..e3907b7
+--- /dev/null
++++ b/frontend-themed 5/src/components/PoseSilhouette.jsx	
+@@ -0,0 +1,87 @@
++// ─────────────────────────────────────────────────────────────
++// PoseSilhouette — renders a pose (one or more stick-figure actors)
++// as a lightweight inline SVG. Used both as small thumbnails in the
++// pose library grid and as the big semi-transparent overlay shown
++// on top of the live webcam preview.
++// ─────────────────────────────────────────────────────────────
++
++function armTarget(side, variant, s) {
++  // side: 1 for right arm, -1 for left arm (mirrored)
++  const sign = side
++  switch (variant) {
++    case "up":        return { x: sign * 9 * s,  y: -24 * s }
++    case "out":        return { x: sign * 20 * s, y: -2 * s }
++    case "hip":        return { x: sign * 8 * s,  y: 11 * s }
++    case "wave":       return { x: sign * 15 * s, y: -20 * s }
++    case "peace":      return { x: sign * 7 * s,  y: -22 * s }
++    case "heartL":     return { x: -3 * s,        y: 7 * s }
++    case "heartR":     return { x: 3 * s,         y: 7 * s }
++    case "shoulderL":  return { x: -20 * s,       y: -7 * s }
++    case "shoulderR":  return { x: 20 * s,        y: -7 * s }
++    case "down":
++    default:           return { x: sign * 10 * s, y: 22 * s }
++  }
++}
++
++function legTargets(variant, s) {
++  switch (variant) {
++    case "apart": return [{ x: -15 * s, y: 27 * s }, { x: 15 * s, y: 27 * s }]
++    case "cross": return [{ x: 5 * s, y: 26 * s }, { x: -3 * s, y: 26 * s }]
++    case "kick":  return [{ x: -17 * s, y: 13 * s }, { x: 17 * s, y: 15 * s }]
++    case "sit":   return [{ x: -11 * s, y: 15 * s }, { x: 11 * s, y: 15 * s }]
++    case "stand":
++    default:      return [{ x: -6 * s, y: 27 * s }, { x: 6 * s, y: 27 * s }]
++  }
++}
++
++function Actor({ x, y, scale, armL, armR, legs, headTilt = 0, color = "#FFFFFF" }) {
++  const s = scale
++  const shoulderY = y - 22 * s
++  const headY = shoulderY - 10 * s
++  const headR = 6 * s
++
++  const lArm = armTarget(-1, armL, s)
++  const rArm = armTarget(1, armR, s)
++  const [lLeg, rLeg] = legTargets(legs, s)
++
++  const strokeW = Math.max(2.4, 4.2 * s)
++
++  return (
++    <g style={{ transformOrigin: `${x}px ${y}px` }}>
++      {/* legs */}
++      <line x1={x} y1={y} x2={x + lLeg.x} y2={y + lLeg.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      <line x1={x} y1={y} x2={x + rLeg.x} y2={y + rLeg.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      {/* torso */}
++      <line x1={x} y1={shoulderY} x2={x} y2={y} stroke={color} strokeWidth={strokeW * 1.35} strokeLinecap="round" />
++      {/* arms */}
++      <line x1={x} y1={shoulderY + 2 * s} x2={x + lArm.x} y2={shoulderY + 2 * s + lArm.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      <line x1={x} y1={shoulderY + 2 * s} x2={x + rArm.x} y2={shoulderY + 2 * s + rArm.y} stroke={color} strokeWidth={strokeW} strokeLinecap="round" />
++      {/* hands (little dots so gestures like peace/wave/heart read clearly) */}
++      <circle cx={x + lArm.x} cy={shoulderY + 2 * s + lArm.y} r={strokeW * 0.55} fill={color} />
++      <circle cx={x + rArm.x} cy={shoulderY + 2 * s + rArm.y} r={strokeW * 0.55} fill={color} />
++      {/* head */}
++      <circle
++        cx={x}
++        cy={headY}
++        r={headR}
++        fill={color}
++        style={{ transform: `rotate(${headTilt}deg)`, transformOrigin: `${x}px ${headY}px` }}
++      />
++    </g>
++  )
++}
++
++export default function PoseSilhouette({ pose, color = "#FFFFFF", opacity = 0.85, style = {} }) {
++  if (!pose) return null
++  return (
++    <svg
++      viewBox="0 0 100 100"
++      preserveAspectRatio="xMidYMax meet"
++      style={{ display: "block", width: "100%", height: "100%", opacity, ...style }}
++    >
++      {pose.actors.map((actor, i) => (
++        <Actor key={i} {...actor} color={color} />
++      ))}
++    </svg>
++  )
++}
+diff --git a/frontend-themed 5/src/components/TransformableLayer.jsx b/frontend-themed 5/src/components/TransformableLayer.jsx
+new file mode 100644
+index 0000000..6f7f03a
+--- /dev/null
++++ b/frontend-themed 5/src/components/TransformableLayer.jsx	
+@@ -0,0 +1,177 @@
++import { useCallback, useRef } from "react"
++
++// ─────────────────────────────────────────────────────────────
++// TransformableLayer — a sticker/media layer on the Smart Frame
++// Studio canvas that can be freely dragged, resized and rotated.
++//
++// The layer's (x, y) is its CENTER in canvas-space pixels; the
++// parent canvas "stage" element may be visually scaled down with
++// CSS (transform: scale(...)) to fit the screen, so every pointer
++// event is converted from screen space to canvas space via the
++// stage's bounding rect before doing any math. This keeps the
++// drag/resize/rotate math simple regardless of zoom level.
++// ─────────────────────────────────────────────────────────────
++
++function toCanvasPoint(e, stageRef) {
++  const rect = stageRef.current.getBoundingClientRect()
++  const scaleX = rect.width  || 1
++  const scaleY = rect.height || 1
++  // stageRef holds the *visual* (scaled) box; caller passes the
++  // logical canvas size separately so we can normalize.
++  return { clientX: e.clientX, clientY: e.clientY, rect, scaleX, scaleY }
++}
++
++export default function TransformableLayer({
++  layer, selected, stageRef, canvasW, canvasH,
++  onSelect, onChange, onDelete, onDuplicate,
++}) {
++  const dragState = useRef(null)
++
++  const canvasPos = useCallback((clientX, clientY) => {
++    const rect = stageRef.current.getBoundingClientRect()
++    const x = ((clientX - rect.left) / rect.width) * canvasW
++    const y = ((clientY - rect.top) / rect.height) * canvasH
++    return { x, y }
++  }, [stageRef, canvasW, canvasH])
++
++  const startDrag = useCallback((e) => {
++    e.stopPropagation()
++    onSelect(layer.id)
++    const p = canvasPos(e.clientX, e.clientY)
++    dragState.current = { mode: "move", offX: p.x - layer.x, offY: p.y - layer.y }
++
++    const onMove = (ev) => {
++      const cp = canvasPos(ev.clientX, ev.clientY)
++      onChange(layer.id, { x: cp.x - dragState.current.offX, y: cp.y - dragState.current.offY })
++    }
++    const onUp = () => {
++      dragState.current = null
++      window.removeEventListener("pointermove", onMove)
++      window.removeEventListener("pointerup", onUp)
++    }
++    window.addEventListener("pointermove", onMove)
++    window.addEventListener("pointerup", onUp)
++  }, [layer, onChange, onSelect, canvasPos])
++
++  const startResize = useCallback((e) => {
++    e.stopPropagation()
++    onSelect(layer.id)
++    const p = canvasPos(e.clientX, e.clientY)
++    const startDist = Math.max(10, Math.hypot(p.x - layer.x, p.y - layer.y))
++    const startW = layer.w, startH = layer.h
++
++    const onMove = (ev) => {
++      const cp = canvasPos(ev.clientX, ev.clientY)
++      const dist = Math.hypot(cp.x - layer.x, cp.y - layer.y)
++      const factor = Math.max(0.15, Math.min(6, dist / startDist))
++      onChange(layer.id, {
++        w: Math.max(24, startW * factor),
++        h: Math.max(24, startH * factor),
++      })
++    }
++    const onUp = () => {
++      window.removeEventListener("pointermove", onMove)
++      window.removeEventListener("pointerup", onUp)
++    }
++    window.addEventListener("pointermove", onMove)
++    window.addEventListener("pointerup", onUp)
++  }, [layer, onChange, onSelect, canvasPos])
++
++  const startRotate = useCallback((e) => {
++    e.stopPropagation()
++    onSelect(layer.id)
++
++    const onMove = (ev) => {
++      const cp = canvasPos(ev.clientX, ev.clientY)
++      const angle = Math.atan2(cp.y - layer.y, cp.x - layer.x) * (180 / Math.PI)
++      onChange(layer.id, { rotation: angle + 90 })
++    }
++    const onUp = () => {
++      window.removeEventListener("pointermove", onMove)
++      window.removeEventListener("pointerup", onUp)
++    }
++    window.addEventListener("pointermove", onMove)
++    window.addEventListener("pointerup", onUp)
++  }, [layer, onChange, onSelect, canvasPos])
++
++  return (
++    <div
++      onPointerDown={startDrag}
++      style={{
++        position: "absolute",
++        left: layer.x - layer.w / 2,
++        top: layer.y - layer.h / 2,
++        width: layer.w,
++        height: layer.h,
++        transform: `rotate(${layer.rotation}deg)`,
++        cursor: "grab",
++        touchAction: "none",
++        outline: selected ? "2px dashed rgba(224,122,149,0.9)" : "none",
++        outlineOffset: 4,
++      }}
++    >
++      {layer.variant === "emoji" ? (
++        <div style={{
++          width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center",
++          fontSize: layer.h * 0.82, lineHeight: 1, userSelect: "none", pointerEvents: "none",
++        }}>
++          {layer.emoji}
++        </div>
++      ) : (
++        <img
++          src={layer.src}
++          alt=""
++          draggable={false}
++          style={{ width: "100%", height: "100%", objectFit: "contain", pointerEvents: "none", userSelect: "none" }}
++        />
++      )}
++
++      {selected && (
++        <>
++          {/* floating toolbar */}
++          <div style={{
++            position: "absolute", top: -34, left: "50%", transform: "translateX(-50%)",
++            display: "flex", gap: 4, background: "rgba(61,52,80,0.9)", borderRadius: 8, padding: 3,
++          }}>
++            <button
++              onPointerDown={(e) => e.stopPropagation()}
++              onClick={(e) => { e.stopPropagation(); onDuplicate(layer.id) }}
++              title="Duplicate" style={miniBtnStyle}
++            >⧉</button>
++            <button
++              onPointerDown={(e) => e.stopPropagation()}
++              onClick={(e) => { e.stopPropagation(); onDelete(layer.id) }}
++              title="Delete" style={miniBtnStyle}
++            >✕</button>
++          </div>
++
++          {/* rotate handle */}
++          <div
++            onPointerDown={startRotate}
++            title="Rotate"
++            style={{
++              position: "absolute", top: -22, left: "50%", transform: "translateX(-50%)",
++              width: 14, height: 14, borderRadius: "50%",
++              background: "white", border: "2px solid var(--pink-dark)", cursor: "grab",
++            }}
++          />
++          {/* resize handle */}
++          <div
++            onPointerDown={startResize}
++            title="Resize"
++            style={{
++              position: "absolute", bottom: -7, right: -7,
++              width: 14, height: 14, borderRadius: "50%",
++              background: "white", border: "2px solid var(--denim-dark)", cursor: "nwse-resize",
++            }}
++          />
++        </>
++      )}
++    </div>
++  )
++}
++
++const miniBtnStyle = {
++  background: "none", border: "none", color: "white", fontSize: 12,
++  cursor: "pointer", padding: "2px 6px", borderRadius: 4,
++}
+diff --git a/frontend-themed 5/src/data/frameStudioAssets.js b/frontend-themed 5/src/data/frameStudioAssets.js
+new file mode 100644
+index 0000000..94684ee
+--- /dev/null
++++ b/frontend-themed 5/src/data/frameStudioAssets.js	
+@@ -0,0 +1,150 @@
++// ─────────────────────────────────────────────────────────────
++// Smart Frame Studio — asset & preset definitions (Feature 5)
++//
++// Kept as plain JS data (not JSON) so each preset can carry both a
++// CSS description (for the live DOM editor) and a canvas draw
++// function (for the final export render) that share the same
++// numbers — so what you see while editing matches what you export.
++// ─────────────────────────────────────────────────────────────
++
++export const CANVAS_PRESETS = [
++  { id: "strip",  label: "Photo Strip", description: "Tall keepsake strip", w: 900,  h: 1350, emoji: "🎞️" },
++  { id: "square", label: "Square Collage", description: "Instagram-style square", w: 1080, h: 1080, emoji: "⬛" },
++  { id: "wide",   label: "Wide Banner", description: "Landscape memory board", w: 1280, h: 900, emoji: "🖼️" },
++]
++
++// ── Backgrounds ─────────────────────────────────────────────
++export const BACKGROUND_PRESETS = [
++  { id: "cream",     label: "Cream",       colors: ["#FEFAF6", "#F5EDE3"] },
++  { id: "denim",     label: "Denim Sky",   colors: ["#A8C4D8", "#5A7A96"] },
++  { id: "pink-dream", label: "Pink Dream", colors: ["#FDE8EE", "#F4A7B9"] },
++  { id: "sunset",    label: "Sunset",      colors: ["#F4A7B9", "#7B9BB5"] },
++  { id: "lavender",  label: "Lavender",    colors: ["#E4DEF5", "#B9A8D8"] },
++  { id: "mint",      label: "Mint",        colors: ["#DCF3E8", "#8FCBAE"] },
++]
++
++export function backgroundCss(preset) {
++  if (!preset) return "#FEFAF6"
++  const [a, b] = preset.colors
++  return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
++}
++
++export function drawBackgroundPreset(ctx, preset, w, h) {
++  const [a, b] = preset.colors
++  const grad = ctx.createLinearGradient(0, 0, w, h)
++  grad.addColorStop(0, a)
++  grad.addColorStop(1, b)
++  ctx.fillStyle = grad
++  ctx.fillRect(0, 0, w, h)
++}
++
++// ── Decorative frames ───────────────────────────────────────
++// Each preset draws its border as bands/shapes relative to canvas
++// size so it scales cleanly across the three canvas presets above.
++export const FRAME_PRESETS = [
++  { id: "none", label: "None", swatch: "transparent" },
++  {
++    id: "polaroid",
++    label: "Polaroid White",
++    swatch: "#FFFFFF",
++    thicknessRatio: 0.045,
++    draw(ctx, w, h) {
++      const t = Math.round(w * this.thicknessRatio)
++      ctx.fillStyle = "#FFFFFF"
++      ctx.fillRect(0, 0, w, t)          // top
++      ctx.fillRect(0, h - t * 1.8, w, t * 1.8) // thicker bottom, polaroid-style
++      ctx.fillRect(0, 0, t, h)          // left
++      ctx.fillRect(w - t, 0, t, h)      // right
++    },
++  },
++  {
++    id: "pinkDashed",
++    label: "Pink Dashed",
++    swatch: "#E07A95",
++    draw(ctx, w, h) {
++      const inset = w * 0.035
++      ctx.save()
++      ctx.strokeStyle = "#E07A95"
++      ctx.lineWidth = Math.max(4, w * 0.012)
++      ctx.setLineDash([w * 0.02, w * 0.014])
++      ctx.strokeRect(inset, inset, w - inset * 2, h - inset * 2)
++      ctx.restore()
++    },
++  },
++  {
++    id: "washiCorners",
++    label: "Washi Corners",
++    swatch: "linear-gradient(90deg,#F4A7B9,#A8C4D8)",
++    draw(ctx, w, h) {
++      const tapeW = w * 0.16
++      const tapeH = w * 0.05
++      const corners = [
++        { x: tapeW * 0.15, y: tapeH * 0.4, rot: -12 },
++        { x: w - tapeW * 1.15, y: tapeH * 0.4, rot: 12 },
++        { x: tapeW * 0.15, y: h - tapeH * 1.4, rot: 12 },
++        { x: w - tapeW * 1.15, y: h - tapeH * 1.4, rot: -12 },
++      ]
++      ctx.save()
++      ctx.fillStyle = "rgba(244,167,185,0.75)"
++      corners.forEach(({ x, y, rot }) => {
++        ctx.save()
++        ctx.translate(x + tapeW / 2, y + tapeH / 2)
++        ctx.rotate((rot * Math.PI) / 180)
++        ctx.fillRect(-tapeW / 2, -tapeH / 2, tapeW, tapeH)
++        ctx.restore()
++      })
++      ctx.restore()
++    },
++  },
++  {
++    id: "denimBorder",
++    label: "Denim Bold",
++    swatch: "#5A7A96",
++    thicknessRatio: 0.03,
++    draw(ctx, w, h) {
++      const t = Math.round(w * this.thicknessRatio)
++      ctx.strokeStyle = "#5A7A96"
++      ctx.lineWidth = t
++      ctx.strokeRect(t / 2, t / 2, w - t, h - t)
++    },
++  },
++]
++
++// CSS-only preview approximations of the frame presets above, used
++// while editing (drawn as an absolutely-positioned overlay div).
++export function frameOverlayStyle(frameId) {
++  switch (frameId) {
++    case "polaroid":
++      return { border: "24px solid #FFFFFF", borderBottomWidth: 42 }
++    case "pinkDashed":
++      return { border: "5px dashed #E07A95", margin: 14 }
++    case "denimBorder":
++      return { border: "10px solid #5A7A96" }
++    default:
++      return null
++  }
++}
++
++// ── Sticker library ─────────────────────────────────────────
++export const STICKER_CATEGORIES = [
++  {
++    id: "hearts", label: "Hearts",
++    items: ["💖", "💕", "💗", "💓", "❤️", "🩷"],
++  },
++  {
++    id: "stars", label: "Stars & Sparkle",
++    items: ["⭐", "✨", "🌟", "💫", "🌙", "☁️"],
++  },
++  {
++    id: "party", label: "Party",
++    items: ["🎉", "🎊", "🥳", "🎈", "🎀", "🍾"],
++  },
++  {
++    id: "cute", label: "Cute",
++    items: ["🌸", "🌺", "🦋", "🌈", "🍡", "🧸"],
++  },
++  {
++    id: "fun", label: "Fun",
++    items: ["😎", "👑", "🔥", "💯", "📸", "✌️"],
++  },
++]
+diff --git a/frontend-themed 5/src/data/poses.js b/frontend-themed 5/src/data/poses.js
+new file mode 100644
+index 0000000..e69d931
+--- /dev/null
++++ b/frontend-themed 5/src/data/poses.js	
+@@ -0,0 +1,159 @@
++// ─────────────────────────────────────────────────────────────
++// Pose Assistant — pose template library
++//
++// Each pose is described declaratively as one or more stick-figure
++// "actors" (see components/PoseSilhouette.jsx for the renderer) so
++// the whole library stays lightweight (no image assets to ship) and
++// easy to extend — add a new object here and it shows up everywhere.
++//
++// Actor fields (all in a 0–100 x 0–100 canvas, mirrored for camera):
++//   x, y      — hip anchor position
++//   scale     — overall size multiplier
++//   armL/armR — "down" | "up" | "out" | "hip" | "wave" | "heart"
++//   legs      — "stand" | "apart" | "cross" | "kick" | "sit"
++//   headTilt  — degrees, small head tilt for personality
++// ─────────────────────────────────────────────────────────────
++
++export const POSE_TYPES = [
++  { id: "single", label: "Single",  emoji: "🧍", description: "Just you" },
++  { id: "couple", label: "Couple",  emoji: "🧑‍🤝‍🧑", description: "Two people" },
++  { id: "group",  label: "Group",   emoji: "👥", description: "Three or more" },
++]
++
++export const POSES = [
++  // ── Single ──────────────────────────────────────────────
++  {
++    id: "single-peace",
++    type: "single",
++    label: "Peace Sign",
++    tip: "Flash a peace sign near your face",
++    actors: [{ x: 50, y: 62, scale: 1.15, armL: "down", armR: "peace", legs: "stand", headTilt: -4 }],
++  },
++  {
++    id: "single-hands-heart",
++    type: "single",
++    label: "Hands Heart",
++    tip: "Form a heart shape with both hands",
++    actors: [{ x: 50, y: 62, scale: 1.15, armL: "heartL", armR: "heartR", legs: "stand", headTilt: 0 }],
++  },
++  {
++    id: "single-hip",
++    type: "single",
++    label: "Hand on Hip",
++    tip: "One hand on your hip, weight on one leg",
++    actors: [{ x: 50, y: 62, scale: 1.15, armL: "hip", armR: "down", legs: "cross", headTilt: 6 }],
++  },
++  {
++    id: "single-jump",
++    type: "single",
++    label: "Jump Shot",
++    tip: "Jump with arms and legs spread wide",
++    actors: [{ x: 50, y: 55, scale: 1.15, armL: "up", armR: "up", legs: "kick", headTilt: -3 }],
++  },
++  {
++    id: "single-wave",
++    type: "single",
++    label: "Friendly Wave",
++    tip: "Wave at the camera with a big smile",
++    actors: [{ x: 50, y: 62, scale: 1.15, armL: "down", armR: "wave", legs: "stand", headTilt: -5 }],
++  },
++
++  // ── Couple ──────────────────────────────────────────────
++  {
++    id: "couple-shoulder",
++    type: "couple",
++    label: "Arm Around",
++    tip: "One arm around your partner's shoulder",
++    actors: [
++      { x: 36, y: 62, scale: 1.05, armL: "down", armR: "shoulderR", legs: "stand", headTilt: -6 },
++      { x: 64, y: 62, scale: 1.05, armL: "shoulderL", armR: "down", legs: "stand", headTilt: 6 },
++    ],
++  },
++  {
++    id: "couple-back-to-back",
++    type: "couple",
++    label: "Back to Back",
++    tip: "Stand back-to-back, arms crossed",
++    actors: [
++      { x: 38, y: 62, scale: 1.05, armL: "hip", armR: "hip", legs: "cross", headTilt: -8, mirror: true },
++      { x: 62, y: 62, scale: 1.05, armL: "hip", armR: "hip", legs: "cross", headTilt: 8 },
++    ],
++  },
++  {
++    id: "couple-heart",
++    type: "couple",
++    label: "Shared Heart",
++    tip: "Each forms half a heart with inside hands",
++    actors: [
++      { x: 38, y: 62, scale: 1.05, armL: "down", armR: "heartR", legs: "stand", headTilt: -5 },
++      { x: 62, y: 62, scale: 1.05, armL: "heartL", armR: "down", legs: "stand", headTilt: 5 },
++    ],
++  },
++  {
++    id: "couple-piggyback",
++    type: "couple",
++    label: "Piggyback",
++    tip: "One hops on the other's back",
++    actors: [
++      { x: 40, y: 66, scale: 1.1, armL: "down", armR: "down", legs: "apart", headTilt: -4 },
++      { x: 58, y: 50, scale: 0.95, armL: "up", armR: "up", legs: "sit", headTilt: 6 },
++    ],
++  },
++
++  // ── Group ───────────────────────────────────────────────
++  {
++    id: "group-lineup",
++    type: "group",
++    label: "Classic Lineup",
++    tip: "Everyone stands shoulder to shoulder",
++    actors: [
++      { x: 25, y: 64, scale: 0.9, armL: "down", armR: "shoulderR", legs: "stand", headTilt: -6 },
++      { x: 45, y: 64, scale: 0.9, armL: "shoulderL", armR: "shoulderR", legs: "stand", headTilt: 0 },
++      { x: 65, y: 64, scale: 0.9, armL: "shoulderL", armR: "shoulderR", legs: "stand", headTilt: 4 },
++      { x: 85, y: 64, scale: 0.9, armL: "shoulderL", armR: "down", legs: "stand", headTilt: 6 },
++    ],
++  },
++  {
++    id: "group-jump",
++    type: "group",
++    label: "Group Jump",
++    tip: "Everyone jumps together on 3",
++    actors: [
++      { x: 28, y: 55, scale: 0.85, armL: "up", armR: "up", legs: "kick", headTilt: -5 },
++      { x: 50, y: 52, scale: 0.85, armL: "up", armR: "up", legs: "kick", headTilt: 0 },
++      { x: 72, y: 55, scale: 0.85, armL: "up", armR: "up", legs: "kick", headTilt: 5 },
++    ],
++  },
++  {
++    id: "group-huddle",
++    type: "group",
++    label: "Huddle In",
++    tip: "Lean heads in close together",
++    actors: [
++      { x: 32, y: 60, scale: 0.85, armL: "hip", armR: "shoulderR", legs: "stand", headTilt: 10 },
++      { x: 50, y: 58, scale: 0.85, armL: "shoulderL", armR: "shoulderR", legs: "stand", headTilt: -4 },
++      { x: 68, y: 60, scale: 0.85, armL: "shoulderL", armR: "hip", legs: "stand", headTilt: -10 },
++    ],
++  },
++  {
++    id: "group-pyramid",
++    type: "group",
++    label: "Staggered Pyramid",
++    tip: "Front person crouches, back people stand tall",
++    actors: [
++      { x: 30, y: 70, scale: 0.75, armL: "hip", armR: "peace", legs: "sit", headTilt: -6 },
++      { x: 50, y: 60, scale: 0.9,  armL: "down", armR: "up",   legs: "stand", headTilt: 0 },
++      { x: 70, y: 70, scale: 0.75, armL: "peace", armR: "hip", legs: "sit", headTilt: 6 },
++    ],
++  },
++]
++
++export function getPosesByType(type) {
++  return POSES.filter((p) => p.type === type)
++}
++
++export function getRandomPose(type) {
++  const pool = getPosesByType(type)
++  if (pool.length === 0) return null
++  return pool[Math.floor(Math.random() * pool.length)]
++}
+diff --git a/frontend-themed 5/src/pages/Dashboard.jsx b/frontend-themed 5/src/pages/Dashboard.jsx
+index 327f344..6f7b7dc 100644
+--- a/frontend-themed 5/src/pages/Dashboard.jsx	
++++ b/frontend-themed 5/src/pages/Dashboard.jsx	
+@@ -101,6 +101,22 @@ export default function Dashboard() {
+                 <span style={{ fontSize: 16 }}>🎞️</span> Create Frame
+               </button>
+             )}
++            <button
++              className="btn-secondary"
++              onClick={() => navigate("/frame-studio")}
++              style={{ display: "flex", alignItems: "center", gap: 8 }}
++            >
++              <span style={{ fontSize: 16 }}>🖼️</span> Frame Studio
++            </button>
++            {captures.length >= 1 && (
++              <button
++                className="btn-secondary"
++                onClick={() => navigate("/sticker-export")}
++                style={{ display: "flex", alignItems: "center", gap: 8 }}
++              >
++                <span style={{ fontSize: 16 }}>🏷️</span> Sticker Pack
++              </button>
++            )}
+             <button
+               className="btn-secondary"
+               onClick={() => navigate("/gesture-gif")}
+diff --git a/frontend-themed 5/src/pages/FrameStudio.jsx b/frontend-themed 5/src/pages/FrameStudio.jsx
+new file mode 100644
+index 0000000..cc92a73
+--- /dev/null
++++ b/frontend-themed 5/src/pages/FrameStudio.jsx	
+@@ -0,0 +1,628 @@
++import { useState, useRef, useCallback, useEffect } from "react"
++import { useNavigate } from "react-router-dom"
++import { listCaptures, getCaptureImageUrl } from "../api/api"
++import AuthImage from "../components/AuthImage"
++import TransformableLayer from "../components/TransformableLayer"
++import {
++  CANVAS_PRESETS, BACKGROUND_PRESETS, FRAME_PRESETS, STICKER_CATEGORIES,
++  backgroundCss, drawBackgroundPreset, frameOverlayStyle,
++} from "../data/frameStudioAssets"
++
++// ─────────────────────────────────────────────────────────────
++// Feature 5 — Smart Frame Studio
++//
++// A layered editor: pick a canvas template, then freely combine a
++// background (preset or your own upload), a decorative frame
++// overlay, built-in or custom stickers, and photos/GIFs from your
++// archive — every sticker/media layer can be dragged, resized and
++// rotated anywhere on the canvas. If any placed media is a GIF the
++// final composition is exported as a short looping video so the
++// motion is preserved; otherwise it exports as a still image.
++// ─────────────────────────────────────────────────────────────
++
++const PREVIEW_TARGET_W = 420
++
++let uidCounter = 0
++const uid = () => `l${Date.now()}_${uidCounter++}`
++
++async function fetchAsDataUrl(captureId) {
++  const token = localStorage.getItem("token")
++  const res = await fetch(getCaptureImageUrl(captureId), {
++    headers: { Authorization: `Bearer ${token}` },
++  })
++  if (!res.ok) throw new Error("Failed to fetch media")
++  const blob = await res.blob()
++  return new Promise((resolve, reject) => {
++    const reader = new FileReader()
++    reader.onload = () => resolve(reader.result)
++    reader.onerror = reject
++    reader.readAsDataURL(blob)
++  })
++}
++
++function fileToDataUrl(file) {
++  return new Promise((resolve, reject) => {
++    const reader = new FileReader()
++    reader.onload = () => resolve(reader.result)
++    reader.onerror = reject
++    reader.readAsDataURL(file)
++  })
++}
++
++function loadImageEl(src) {
++  return new Promise((resolve, reject) => {
++    const img = new Image()
++    img.onload = () => resolve(img)
++    img.onerror = reject
++    img.src = src
++  })
++}
++
++function coverDraw(ctx, img, w, h) {
++  const iAspect = img.width / img.height
++  const sAspect = w / h
++  let sx, sy, sw, sh
++  if (iAspect > sAspect) {
++    sh = img.height; sw = sh * sAspect
++    sx = (img.width - sw) / 2; sy = 0
++  } else {
++    sw = img.width; sh = sw / sAspect
++    sx = 0; sy = (img.height - sh) / 2
++  }
++  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h)
++}
++
++export default function FrameStudio() {
++  const navigate = useNavigate()
++
++  const [step, setStep] = useState("canvas")           // canvas | edit | export
++  const [canvasPreset, setCanvasPreset] = useState(null)
++
++  const [background, setBackground] = useState({ kind: "preset", value: "cream" })
++  const [frameId, setFrameId] = useState("none")
++  const [layers, setLayers] = useState([])
++  const [selectedLayerId, setSelectedLayerId] = useState(null)
++  const [activeTab, setActiveTab] = useState("background")
++
++  const [gallery, setGallery] = useState([])
++  const [galleryLoading, setGalleryLoading] = useState(false)
++  const [addingMediaId, setAddingMediaId] = useState(null)
++
++  const [exporting, setExporting] = useState(false)
++  const [exportMsg, setExportMsg] = useState("")
++  const [resultUrl, setResultUrl] = useState(null)
++  const [resultKind, setResultKind] = useState(null)
++
++  const stageRef = useRef(null)
++  const zCounter = useRef(1)
++  const bgFileRef = useRef(null)
++  const stickerFileRef = useRef(null)
++
++  const nextZ = () => zCounter.current++
++
++  // ── Canvas step ─────────────────────────────────────────────
++  const handleSelectCanvas = (preset) => {
++    setCanvasPreset(preset)
++    setStep("edit")
++  }
++
++  const previewScale = canvasPreset ? Math.min(1, PREVIEW_TARGET_W / canvasPreset.w) : 1
++  const previewW = canvasPreset ? canvasPreset.w * previewScale : 0
++  const previewH = canvasPreset ? canvasPreset.h * previewScale : 0
++
++  // ── Layer helpers ───────────────────────────────────────────
++  const updateLayer = useCallback((id, partial) => {
++    setLayers((prev) => prev.map((l) => (l.id === id ? { ...l, ...partial } : l)))
++  }, [])
++
++  const deleteLayer = useCallback((id) => {
++    setLayers((prev) => prev.filter((l) => l.id !== id))
++    setSelectedLayerId((cur) => (cur === id ? null : cur))
++  }, [])
++
++  const duplicateLayer = useCallback((id) => {
++    setLayers((prev) => {
++      const src = prev.find((l) => l.id === id)
++      if (!src) return prev
++      const copy = { ...src, id: uid(), x: src.x + 24, y: src.y + 24, z: nextZ() }
++      setSelectedLayerId(copy.id)
++      return [...prev, copy]
++    })
++  }, [])
++
++  const addStickerEmoji = useCallback((emoji) => {
++    if (!canvasPreset) return
++    const size = canvasPreset.w * 0.16
++    const layer = {
++      id: uid(), kind: "sticker", variant: "emoji", emoji,
++      x: canvasPreset.w / 2, y: canvasPreset.h / 2,
++      w: size, h: size, rotation: 0, z: nextZ(),
++    }
++    setLayers((prev) => [...prev, layer])
++    setSelectedLayerId(layer.id)
++  }, [canvasPreset])
++
++  const addStickerImage = useCallback(async (file) => {
++    if (!canvasPreset) return
++    const dataUrl = await fileToDataUrl(file)
++    const img = await loadImageEl(dataUrl)
++    const maxDim = canvasPreset.w * 0.28
++    const scale = Math.min(maxDim / img.width, maxDim / img.height, 1)
++    const layer = {
++      id: uid(), kind: "sticker", variant: "image", src: dataUrl, isGif: false,
++      x: canvasPreset.w / 2, y: canvasPreset.h / 2,
++      w: img.width * scale, h: img.height * scale, rotation: 0, z: nextZ(),
++    }
++    setLayers((prev) => [...prev, layer])
++    setSelectedLayerId(layer.id)
++  }, [canvasPreset])
++
++  const addMediaFromGallery = useCallback(async (capture) => {
++    if (!canvasPreset) return
++    setAddingMediaId(capture.id)
++    try {
++      const dataUrl = await fetchAsDataUrl(capture.id)
++      const img = await loadImageEl(dataUrl)
++      const maxDim = canvasPreset.w * 0.55
++      const scale = Math.min(maxDim / img.width, maxDim / img.height, 1)
++      const layer = {
++        id: uid(), kind: "media", variant: "image", src: dataUrl,
++        isGif: capture.media_type === "gif" || (capture.content_type || "").includes("gif"),
++        x: canvasPreset.w / 2, y: canvasPreset.h / 2,
++        w: img.width * scale, h: img.height * scale, rotation: 0, z: nextZ(),
++      }
++      setLayers((prev) => [...prev, layer])
++      setSelectedLayerId(layer.id)
++    } catch {
++      alert("Could not add this memory to the canvas.")
++    } finally {
++      setAddingMediaId(null)
++    }
++  }, [canvasPreset])
++
++  // ── Background upload ───────────────────────────────────────
++  const handleBackgroundUpload = useCallback(async (e) => {
++    const file = e.target.files?.[0]
++    if (!file) return
++    const dataUrl = await fileToDataUrl(file)
++    setBackground({ kind: "image", value: dataUrl })
++    e.target.value = ""
++  }, [])
++
++  // ── Load gallery when Media tab opens ───────────────────────
++  useEffect(() => {
++    if (activeTab === "media" && gallery.length === 0 && !galleryLoading) {
++      setGalleryLoading(true)
++      listCaptures()
++        .then((res) => setGallery(res.data))
++        .catch(() => {})
++        .finally(() => setGalleryLoading(false))
++    }
++  }, [activeTab, gallery.length, galleryLoading])
++
++  // ── Export ───────────────────────────────────────────────────
++  const runExport = useCallback(async () => {
++    if (!canvasPreset) return
++    setExporting(true)
++    setResultUrl(null)
++    setExportMsg("Rendering composition…")
++
++    try {
++      const w = canvasPreset.w, h = canvasPreset.h
++      const canvas = document.createElement("canvas")
++      canvas.width = w
++      canvas.height = h
++      const ctx = canvas.getContext("2d")
++
++      const imgCache = new Map()
++      if (background.kind === "image") {
++        imgCache.set("background", await loadImageEl(background.value))
++      }
++      for (const l of layers) {
++        if (l.variant === "image") imgCache.set(l.id, await loadImageEl(l.src))
++      }
++
++      const drawScene = () => {
++        ctx.clearRect(0, 0, w, h)
++        if (background.kind === "preset") {
++          const preset = BACKGROUND_PRESETS.find((b) => b.id === background.value)
++          drawBackgroundPreset(ctx, preset || BACKGROUND_PRESETS[0], w, h)
++        } else if (background.kind === "image" && imgCache.get("background")) {
++          coverDraw(ctx, imgCache.get("background"), w, h)
++        }
++
++        for (const l of [...layers].sort((a, b) => a.z - b.z)) {
++          ctx.save()
++          ctx.translate(l.x, l.y)
++          ctx.rotate((l.rotation * Math.PI) / 180)
++          if (l.variant === "emoji") {
++            ctx.font = `${l.h}px sans-serif`
++            ctx.textAlign = "center"
++            ctx.textBaseline = "middle"
++            ctx.fillText(l.emoji, 0, 0)
++          } else {
++            const img = imgCache.get(l.id)
++            if (img) ctx.drawImage(img, -l.w / 2, -l.h / 2, l.w, l.h)
++          }
++          ctx.restore()
++        }
++
++        const framePreset = FRAME_PRESETS.find((f) => f.id === frameId)
++        framePreset?.draw?.(ctx, w, h)
++      }
++
++      const hasAnimated = layers.some((l) => l.isGif)
++
++      if (!hasAnimated) {
++        drawScene()
++        setResultUrl(canvas.toDataURL("image/png"))
++        setResultKind("image")
++      } else {
++        setExportMsg("Recording video to preserve motion…")
++        const stream = canvas.captureStream(30)
++        const chunks = []
++        const mr = new MediaRecorder(stream, { mimeType: "video/webm" })
++        mr.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
++        const stopped = new Promise((resolve) => { mr.onstop = resolve })
++        mr.start()
++
++        const DURATION_MS = 4000
++        const start = performance.now()
++        const loop = (now) => {
++          drawScene()
++          if (now - start < DURATION_MS) requestAnimationFrame(loop)
++          else mr.stop()
++        }
++        requestAnimationFrame(loop)
++        await stopped
++
++        const blob = new Blob(chunks, { type: "video/webm" })
++        setResultUrl(URL.createObjectURL(blob))
++        setResultKind("video")
++      }
++      setStep("export")
++    } catch (err) {
++      alert("Export failed. Please try again.")
++    } finally {
++      setExporting(false)
++      setExportMsg("")
++    }
++  }, [canvasPreset, background, layers, frameId])
++
++  const selectedLayer = layers.find((l) => l.id === selectedLayerId) || null
++
++  // ─────────────────────────────────────────────────────────
++  // RENDER
++  // ─────────────────────────────────────────────────────────
++  return (
++    <div className="denim-bg" style={{ minHeight: "100vh", paddingBottom: 60 }}>
++
++      <div style={{
++        background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)",
++        borderBottom: "1px solid rgba(255,255,255,0.15)",
++        padding: "16px 32px", display: "flex", alignItems: "center", gap: 16,
++      }}>
++        <button
++          onClick={() => step === "canvas" ? navigate("/dashboard") : setStep(step === "export" ? "edit" : "canvas")}
++          style={{ background: "none", border: "none", color: "white", fontSize: 22, cursor: "pointer", padding: 0 }}
++        >←</button>
++        <h1 className="font-script" style={{ fontSize: 28, color: "white" }}>Smart Frame Studio 🖼️</h1>
++      </div>
++
++      <div style={{ maxWidth: 1040, margin: "0 auto", padding: "32px 24px" }}>
++
++        {/* ══ STEP: choose canvas template ══ */}
++        {step === "canvas" && (
++          <div>
++            <h2 className="font-playfair" style={{ fontSize: 28, color: "white", marginBottom: 8 }}>Choose a template</h2>
++            <p className="font-dm" style={{ color: "rgba(255,255,255,0.65)", marginBottom: 28, fontSize: 14 }}>
++              Pick a canvas shape to start building your composition.
++            </p>
++            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
++              {CANVAS_PRESETS.map((p) => (
++                <button
++                  key={p.id}
++                  onClick={() => handleSelectCanvas(p)}
++                  className="glass-card"
++                  style={{ padding: 28, textAlign: "center", cursor: "pointer", border: "2px solid transparent" }}
++                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--pink)")}
++                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "transparent")}
++                >
++                  <div style={{ fontSize: 40, marginBottom: 10 }}>{p.emoji}</div>
++                  <p className="font-playfair" style={{ fontSize: 18, color: "var(--text)" }}>{p.label}</p>
++                  <p className="font-dm" style={{ fontSize: 13, color: "var(--text-light)", marginTop: 4 }}>{p.description}</p>
++                </button>
++              ))}
++            </div>
++          </div>
++        )}
++
++        {/* ══ STEP: edit ══ */}
++        {step === "edit" && canvasPreset && (
++          <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
++
++            {/* Canvas stage */}
++            <div style={{ flex: "0 0 auto" }}>
++              <div
++                style={{
++                  width: previewW, height: previewH, position: "relative",
++                  overflow: "hidden", borderRadius: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.3)",
++                  background: "#F5EDE3",
++                }}
++                onPointerDown={() => setSelectedLayerId(null)}
++              >
++                <div
++                  ref={stageRef}
++                  style={{
++                    width: canvasPreset.w, height: canvasPreset.h,
++                    transform: `scale(${previewScale})`, transformOrigin: "top left",
++                    position: "relative",
++                    background: background.kind === "preset"
++                      ? backgroundCss(BACKGROUND_PRESETS.find((b) => b.id === background.value))
++                      : "#F5EDE3",
++                  }}
++                >
++                  {background.kind === "image" && (
++                    <img src={background.value} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
++                  )}
++
++                  {layers.sort((a, b) => a.z - b.z).map((l) => (
++                    <TransformableLayer
++                      key={l.id}
++                      layer={l}
++                      selected={selectedLayerId === l.id}
++                      stageRef={stageRef}
++                      canvasW={canvasPreset.w}
++                      canvasH={canvasPreset.h}
++                      onSelect={setSelectedLayerId}
++                      onChange={updateLayer}
++                      onDelete={deleteLayer}
++                      onDuplicate={duplicateLayer}
++                    />
++                  ))}
++
++                  {frameOverlayStyle(frameId) && (
++                    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", boxSizing: "border-box", ...frameOverlayStyle(frameId) }} />
++                  )}
++                </div>
++              </div>
++
++              <button
++                className="btn-primary"
++                onClick={runExport}
++                disabled={exporting}
++                style={{ width: "100%", marginTop: 16 }}
++              >
++                {exporting ? (exportMsg || "Working…") : (layers.some((l) => l.isGif) ? "Export as Video 🎥" : "Export as Image 🖼️")}
++              </button>
++            </div>
++
++            {/* Tabbed side panel */}
++            <div style={{ flex: 1, minWidth: 300 }}>
++              <div className="glass-card" style={{ padding: 20 }}>
++                <div style={{ display: "flex", gap: 6, marginBottom: 18, flexWrap: "wrap" }}>
++                  {[
++                    { id: "background", label: "🎨 Background" },
++                    { id: "frame", label: "🖼️ Frame" },
++                    { id: "stickers", label: "✨ Stickers" },
++                    { id: "media", label: "📷 Media" },
++                    { id: "layers", label: "📚 Layers" },
++                  ].map((t) => (
++                    <button
++                      key={t.id}
++                      onClick={() => setActiveTab(t.id)}
++                      style={{
++                        padding: "7px 12px", borderRadius: 50, border: "1.5px solid",
++                        borderColor: activeTab === t.id ? "var(--pink-dark)" : "rgba(244,167,185,0.3)",
++                        background: activeTab === t.id ? "var(--pink-light)" : "white",
++                        color: activeTab === t.id ? "var(--pink-dark)" : "var(--text-light)",
++                        fontSize: 12.5, fontFamily: "DM Sans, sans-serif", fontWeight: 600, cursor: "pointer",
++                      }}
++                    >
++                      {t.label}
++                    </button>
++                  ))}
++                </div>
++
++                {/* Background tab */}
++                {activeTab === "background" && (
++                  <div>
++                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 16 }}>
++                      {BACKGROUND_PRESETS.map((b) => (
++                        <button
++                          key={b.id}
++                          onClick={() => setBackground({ kind: "preset", value: b.id })}
++                          style={{
++                            aspectRatio: "1", borderRadius: 10, cursor: "pointer",
++                            background: backgroundCss(b),
++                            border: background.kind === "preset" && background.value === b.id ? "3px solid var(--pink-dark)" : "3px solid transparent",
++                          }}
++                          title={b.label}
++                        />
++                      ))}
++                    </div>
++                    <button className="btn-secondary" style={{ width: "100%", fontSize: 13 }} onClick={() => bgFileRef.current?.click()}>
++                      ⬆️ Upload your own background
++                    </button>
++                    <input ref={bgFileRef} type="file" accept="image/*" hidden onChange={handleBackgroundUpload} />
++                  </div>
++                )}
++
++                {/* Frame tab */}
++                {activeTab === "frame" && (
++                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
++                    {FRAME_PRESETS.map((f) => (
++                      <button
++                        key={f.id}
++                        onClick={() => setFrameId(f.id)}
++                        style={{
++                          padding: "14px 8px", borderRadius: 12, cursor: "pointer", textAlign: "center",
++                          background: "white",
++                          border: frameId === f.id ? "2px solid var(--pink-dark)" : "2px solid rgba(244,167,185,0.25)",
++                        }}
++                      >
++                        <div style={{
++                          width: "100%", height: 44, borderRadius: 6, marginBottom: 8,
++                          background: f.id === "none"
++                            ? "repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 10px 10px"
++                            : f.id === "washiCorners" ? f.swatch : "var(--cream-dark)",
++                          border: f.id === "pinkDashed" ? "3px dashed #E07A95"
++                            : (f.id === "polaroid" || f.id === "denimBorder") ? `4px solid ${f.swatch}`
++                            : f.id === "none" ? "1px dashed #ccc" : "1px solid rgba(0,0,0,0.06)",
++                        }} />
++                        <p className="font-dm" style={{ fontSize: 11.5, color: "var(--text)", fontWeight: 600 }}>{f.label}</p>
++                      </button>
++                    ))}
++                  </div>
++                )}
++
++                {/* Stickers tab */}
++                {activeTab === "stickers" && (
++                  <div>
++                    {STICKER_CATEGORIES.map((cat) => (
++                      <div key={cat.id} style={{ marginBottom: 14 }}>
++                        <p className="font-dm" style={{ fontSize: 11.5, color: "var(--text-light)", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
++                          {cat.label}
++                        </p>
++                        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 6 }}>
++                          {cat.items.map((emoji) => (
++                            <button
++                              key={emoji}
++                              onClick={() => addStickerEmoji(emoji)}
++                              style={{
++                                fontSize: 22, padding: 6, borderRadius: 8, border: "1px solid rgba(244,167,185,0.25)",
++                                background: "white", cursor: "pointer",
++                              }}
++                            >
++                              {emoji}
++                            </button>
++                          ))}
++                        </div>
++                      </div>
++                    ))}
++                    <button
++                      className="btn-secondary"
++                      style={{ width: "100%", fontSize: 13, marginTop: 4 }}
++                      onClick={() => stickerFileRef.current?.click()}
++                    >
++                      ⬆️ Upload custom PNG sticker
++                    </button>
++                    <input
++                      ref={stickerFileRef} type="file" accept="image/png,image/webp" hidden
++                      onChange={(e) => { const f = e.target.files?.[0]; if (f) addStickerImage(f); e.target.value = "" }}
++                    />
++                  </div>
++                )}
++
++                {/* Media tab */}
++                {activeTab === "media" && (
++                  <div>
++                    {galleryLoading && (
++                      <p className="font-dm" style={{ fontSize: 13, color: "var(--text-light)", textAlign: "center", padding: 20 }}>Loading your memories…</p>
++                    )}
++                    {!galleryLoading && gallery.length === 0 && (
++                      <p className="font-dm" style={{ fontSize: 13, color: "var(--text-light)", textAlign: "center", padding: 20 }}>
++                        No memories yet — take a photo or GIF first.
++                      </p>
++                    )}
++                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, maxHeight: 340, overflowY: "auto" }}>
++                      {gallery.map((c) => (
++                        <button
++                          key={c.id}
++                          onClick={() => addMediaFromGallery(c)}
++                          disabled={addingMediaId === c.id}
++                          style={{ position: "relative", padding: 0, border: "2px solid transparent", borderRadius: 8, overflow: "hidden", cursor: "pointer", aspectRatio: "1" }}
++                        >
++                          <AuthImage captureId={c.id} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
++                          {(c.media_type === "gif") && (
++                            <span style={{ position: "absolute", top: 4, right: 4, background: "rgba(61,52,80,0.85)", color: "white", fontSize: 9, padding: "2px 5px", borderRadius: 999 }}>GIF</span>
++                          )}
++                          {addingMediaId === c.id && (
++                            <span style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>…</span>
++                          )}
++                        </button>
++                      ))}
++                    </div>
++                  </div>
++                )}
++
++                {/* Layers tab */}
++                {activeTab === "layers" && (
++                  <div>
++                    {layers.length === 0 && (
++                      <p className="font-dm" style={{ fontSize: 13, color: "var(--text-light)", textAlign: "center", padding: 20 }}>
++                        No stickers or media added yet.
++                      </p>
++                    )}
++                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
++                      {[...layers].sort((a, b) => b.z - a.z).map((l) => (
++                        <div
++                          key={l.id}
++                          onClick={() => setSelectedLayerId(l.id)}
++                          style={{
++                            display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 10, cursor: "pointer",
++                            background: selectedLayerId === l.id ? "var(--pink-light)" : "white",
++                            border: "1px solid rgba(244,167,185,0.25)",
++                          }}
++                        >
++                          <div style={{ width: 30, height: 30, borderRadius: 6, overflow: "hidden", background: "var(--cream-dark)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
++                            {l.variant === "emoji" ? l.emoji : <img src={l.src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
++                          </div>
++                          <span className="font-dm" style={{ fontSize: 12.5, color: "var(--text)", flex: 1 }}>
++                            {l.kind === "media" ? (l.isGif ? "GIF layer" : "Photo layer") : "Sticker"}
++                          </span>
++                          <button onClick={(e) => { e.stopPropagation(); duplicateLayer(l.id) }} style={miniIconBtn} title="Duplicate">⧉</button>
++                          <button onClick={(e) => { e.stopPropagation(); deleteLayer(l.id) }} style={miniIconBtn} title="Delete">✕</button>
++                        </div>
++                      ))}
++                    </div>
++                  </div>
++                )}
++              </div>
++
++              {selectedLayer && (
++                <p className="font-dm" style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 10, textAlign: "center" }}>
++                  Drag to move · drag the pink dot to rotate · drag the blue dot to resize
++                </p>
++              )}
++            </div>
++          </div>
++        )}
++
++        {/* ══ STEP: export result ══ */}
++        {step === "export" && resultUrl && (
++          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
++            <p className="font-dm" style={{ color: "rgba(255,255,255,0.75)", fontSize: 14 }}>
++              {resultKind === "video" ? "Your animated composition is ready!" : "Your composition is ready!"}
++            </p>
++
++            <div style={{ background: "white", padding: 14, borderRadius: 8, boxShadow: "0 12px 40px rgba(0,0,0,0.3)", maxWidth: 380 }}>
++              {resultKind === "video" ? (
++                <video src={resultUrl} controls loop autoPlay muted style={{ width: "100%", borderRadius: 4, display: "block" }} />
++              ) : (
++                <img src={resultUrl} alt="Your Smart Frame Studio composition" style={{ width: "100%", borderRadius: 4, display: "block" }} />
++              )}
++            </div>
++
++            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
++              <a
++                href={resultUrl}
++                download={`smart-frame-${Date.now()}.${resultKind === "video" ? "webm" : "png"}`}
++                className="btn-primary"
++                style={{ textDecoration: "none" }}
++              >
++                ⬇️ Download {resultKind === "video" ? "video" : "image"}
++              </a>
++              <button className="btn-secondary" onClick={() => setStep("edit")}>Keep editing</button>
++              <button className="btn-secondary" onClick={() => navigate("/dashboard")}>Back to gallery</button>
++            </div>
++          </div>
++        )}
++      </div>
++    </div>
++  )
++}
++
++const miniIconBtn = {
++  background: "none", border: "none", color: "var(--text-light)", fontSize: 12, cursor: "pointer", padding: 2,
++}
+diff --git a/frontend-themed 5/src/pages/Photobooth.jsx b/frontend-themed 5/src/pages/Photobooth.jsx
+index 5f88f7c..2ea1c65 100644
+--- a/frontend-themed 5/src/pages/Photobooth.jsx	
++++ b/frontend-themed 5/src/pages/Photobooth.jsx	
+@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"
+ import Webcam from "react-webcam"
+ import { useCapture } from "../api/useCapture"
+ import { useGestureDetection } from "../api/useGestureDetection"
++import PoseLibraryModal from "../components/PoseLibraryModal"
++import PoseSilhouette from "../components/PoseSilhouette"
+ 
+ const WEBCAM_CONSTRAINTS = {
+   width:  { ideal: 1280 },
+@@ -61,27 +63,6 @@ function HandIcon({ type }) {
+   )
+ }
+ 
+-function HoldRing({ progress }) {
+-  if (!progress || progress <= 0) return null
+-  const r = 28
+-  const circ = 2 * Math.PI * r
+-  return (
+-    <div style={{
+-      position: "absolute", bottom: 56, left: "50%", transform: "translateX(-50%)",
+-    }}>
+-      <svg width={64} height={64} style={{ transform: "rotate(-90deg)" }}>
+-        <circle cx={32} cy={32} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={4} />
+-        <circle cx={32} cy={32} r={r} fill="none" stroke="white" strokeWidth={4}
+-          strokeDasharray={circ}
+-          strokeDashoffset={circ * (1 - progress)}
+-          strokeLinecap="round"
+-          style={{ transition: "stroke-dashoffset 0.05s linear" }}
+-        />
+-      </svg>
+-    </div>
+-  )
+-}
+-
+ export default function Photobooth() {
+   const navigate  = useNavigate()
+   const webcamRef = useRef(null)
+@@ -97,6 +78,15 @@ export default function Photobooth() {
+   const [countdown,  setCountdown]  = useState(null)
+   const [gestureStatus, setGestureStatus] = useState(null)
+ 
++  // ── Pose Assistant (Feature 6) ─────────────────────────────
++  const [showPoseModal, setShowPoseModal] = useState(false)
++  const [selectedPose,  setSelectedPose]  = useState(null)
++
++  const handlePoseSelect = useCallback((pose) => {
++    setSelectedPose(pose)
++    setShowPoseModal(false)
++  }, [])
++
+   // ── Countdown + capture ────────────────────────────────────
+   const startCountdown = useCallback(() => {
+     // If countdown already running, ignore (manual button pressed during gesture countdown)
+@@ -191,6 +181,15 @@ export default function Photobooth() {
+                 onUserMedia={handleUserMedia}
+               />
+ 
++              {/* Pose overlay — purely a visual guide, not validated */}
++              {selectedPose && countdown === null && (
++                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
++                  <div style={{ width: "70%", height: "92%" }}>
++                    <PoseSilhouette pose={selectedPose} opacity={0.45} />
++                  </div>
++                </div>
++              )}
++
+               {/* Countdown overlay */}
+               {countdown !== null && (
+                 <div style={{
+@@ -216,6 +215,26 @@ export default function Photobooth() {
+               {countdown === null && <StatusBanner status={gestureStatus} />}
+             </div>
+ 
++            {/* Pose Assistant controls */}
++            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
++              <button
++                className="btn-secondary"
++                onClick={() => setShowPoseModal(true)}
++                style={{ fontSize: 13, padding: "9px 20px", display: "flex", alignItems: "center", gap: 6 }}
++              >
++                🕺 {selectedPose ? `Pose: ${selectedPose.label}` : "Pose Assistant"}
++              </button>
++              {selectedPose && (
++                <button
++                  onClick={() => setSelectedPose(null)}
++                  title="Remove pose overlay"
++                  style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: 18, cursor: "pointer" }}
++                >
++                  ✕
++                </button>
++              )}
++            </div>
++
+             <button
+               className="btn-primary"
+               onClick={startCountdown}
+@@ -223,11 +242,13 @@ export default function Photobooth() {
+               style={{ fontSize: 17, padding: "14px 48px", display: "flex", alignItems: "center", gap: 10 }}
+             >
+               <span style={{ fontSize: 22 }}>📷</span>
+-              {countdown !== null ? `Get ready… ${countdown}` : "Take Photo"}
++              {countdown !== null ? `Get ready… ${countdown}` : "Ready — Take Photo"}
+             </button>
+ 
+             <p className="font-dm" style={{ color: "rgba(255,255,255,0.55)", fontSize: 13 }}>
+-              Show an open palm ✋ to trigger, or press the button above
++              {selectedPose
++                ? "Line yourself up with the pose guide, then press Ready"
++                : "Show an open palm ✋ to trigger, or press the button above"}
+             </p>
+           </div>
+         )}
+@@ -332,6 +353,31 @@ export default function Photobooth() {
+         )}
+ 
+       </div>
++
++      {showPoseModal && (
++        <PoseLibraryModal onSelect={handlePoseSelect} onClose={() => setShowPoseModal(false)} />
++      )}
+     </div>
+   )
+-}
+\ No newline at end of file
++}
++
++function HoldRing({ progress }) {
++  if (!progress || progress <= 0) return null
++  const r = 28
++  const circ = 2 * Math.PI * r
++  return (
++    <div style={{
++      position: "absolute", bottom: 56, left: "50%", transform: "translateX(-50%)",
++    }}>
++      <svg width={64} height={64} style={{ transform: "rotate(-90deg)" }}>
++        <circle cx={32} cy={32} r={r} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={4} />
++        <circle cx={32} cy={32} r={r} fill="none" stroke="white" strokeWidth={4}
++          strokeDasharray={circ}
++          strokeDashoffset={circ * (1 - progress)}
++          strokeLinecap="round"
++          style={{ transition: "stroke-dashoffset 0.05s linear" }}
++        />
++      </svg>
++    </div>
++  )
++}
+diff --git a/frontend-themed 5/src/pages/StickerExport.jsx b/frontend-themed 5/src/pages/StickerExport.jsx
+new file mode 100644
+index 0000000..eeb90fa
+--- /dev/null
++++ b/frontend-themed 5/src/pages/StickerExport.jsx	
+@@ -0,0 +1,297 @@
++import { useState, useEffect, useCallback } from "react"
++import { useNavigate } from "react-router-dom"
++import JSZip from "jszip"
++import { listCaptures, getCaptureImageUrl } from "../api/api"
++import AuthImage from "../components/AuthImage"
++
++// ─────────────────────────────────────────────────────────────
++// Feature 7 — Sticker Pack Export
++//
++// Users pick one or more photos/GIFs from their archive and export
++// them as messaging stickers:
++//   • Static photos → resized/padded to a standard 512×512 sticker
++//     canvas and exported as transparent-safe PNGs.
++//   • Animated GIFs → exported as-is (renamed for sticker use) since
++//     that's the native "animated sticker" format most messaging
++//     platforms (WhatsApp, Telegram, Discord, etc.) accept directly.
++// Everything is bundled into a single .zip via JSZip so users get
++// one download for the whole pack, plus a per-item quick download.
++// ─────────────────────────────────────────────────────────────
++
++const STICKER_SIZE = 512
++
++async function fetchAuthBlob(captureId) {
++  const token = localStorage.getItem("token")
++  const res = await fetch(getCaptureImageUrl(captureId), {
++    headers: { Authorization: `Bearer ${token}` },
++  })
++  if (!res.ok) throw new Error("Failed to fetch media")
++  return res.blob()
++}
++
++function blobToImage(blob) {
++  return new Promise((resolve, reject) => {
++    const url = URL.createObjectURL(blob)
++    const img = new Image()
++    img.onload = () => { resolve(img); }
++    img.onerror = reject
++    img.src = url
++  })
++}
++
++// Render a static image into a square sticker canvas (contain-fit,
++// transparent padding) and return a PNG Blob.
++async function makeStaticSticker(blob) {
++  const img = await blobToImage(blob)
++  const canvas = document.createElement("canvas")
++  canvas.width = STICKER_SIZE
++  canvas.height = STICKER_SIZE
++  const ctx = canvas.getContext("2d")
++  ctx.clearRect(0, 0, STICKER_SIZE, STICKER_SIZE)
++
++  const scale = Math.min(STICKER_SIZE / img.width, STICKER_SIZE / img.height)
++  const w = img.width * scale
++  const h = img.height * scale
++  const x = (STICKER_SIZE - w) / 2
++  const y = (STICKER_SIZE - h) / 2
++  ctx.drawImage(img, x, y, w, h)
++
++  return new Promise((resolve) => canvas.toBlob(resolve, "image/png"))
++}
++
++function isAnimated(capture) {
++  return capture.media_type === "gif" || (capture.content_type || "").includes("gif")
++}
++
++function slugify(text, fallback) {
++  const base = (text || fallback || "sticker").toString().trim().toLowerCase()
++  return base.replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || fallback
++}
++
++export default function StickerExport() {
++  const navigate = useNavigate()
++
++  const [captures, setCaptures] = useState([])
++  const [loading,  setLoading]  = useState(true)
++  const [error,    setError]    = useState("")
++  const [selected, setSelected] = useState(new Set())
++  const [exporting, setExporting] = useState(false)
++  const [exportMsg, setExportMsg] = useState("")
++  const [exportedZipUrl, setExportedZipUrl] = useState(null)
++
++  useEffect(() => {
++    listCaptures()
++      .then((res) => setCaptures(res.data))
++      .catch(() => setError("Could not load your memories. Please try again."))
++      .finally(() => setLoading(false))
++  }, [])
++
++  const toggleSelect = (id) => {
++    setExportedZipUrl(null)
++    setSelected((prev) => {
++      const next = new Set(prev)
++      if (next.has(id)) next.delete(id)
++      else next.add(id)
++      return next
++    })
++  }
++
++  const selectAll = () => setSelected(new Set(captures.map((c) => c.id)))
++  const clearAll  = () => setSelected(new Set())
++
++  const handleExport = useCallback(async () => {
++    if (selected.size === 0) return
++    setExporting(true)
++    setExportedZipUrl(null)
++    setExportMsg("Preparing sticker pack…")
++
++    try {
++      const zip = new JSZip()
++      const chosen = captures.filter((c) => selected.has(c.id))
++
++      for (let i = 0; i < chosen.length; i++) {
++        const c = chosen[i]
++        setExportMsg(`Processing ${i + 1} of ${chosen.length}…`)
++        const blob = await fetchAuthBlob(c.id)
++        const name = slugify(c.caption, `sticker-${c.id}`)
++
++        if (isAnimated(c)) {
++          zip.file(`${name}.gif`, blob)
++        } else {
++          const stickerBlob = await makeStaticSticker(blob)
++          zip.file(`${name}.png`, stickerBlob)
++        }
++      }
++
++      setExportMsg("Zipping up…")
++      const zipBlob = await zip.generateAsync({ type: "blob" })
++      const url = URL.createObjectURL(zipBlob)
++      setExportedZipUrl(url)
++      setExportMsg("")
++    } catch (err) {
++      setError("Some stickers could not be exported. Please try again.")
++      setExportMsg("")
++    } finally {
++      setExporting(false)
++    }
++  }, [selected, captures])
++
++  const handleSingleDownload = useCallback(async (capture) => {
++    try {
++      const blob = await fetchAuthBlob(capture.id)
++      const name = slugify(capture.caption, `sticker-${capture.id}`)
++      let outBlob = blob, ext = "gif"
++      if (!isAnimated(capture)) {
++        outBlob = await makeStaticSticker(blob)
++        ext = "png"
++      }
++      const url = URL.createObjectURL(outBlob)
++      const a = document.createElement("a")
++      a.href = url
++      a.download = `${name}.${ext}`
++      a.click()
++      URL.revokeObjectURL(url)
++    } catch {
++      alert("Could not export this sticker.")
++    }
++  }, [])
++
++  return (
++    <div className="denim-bg" style={{ minHeight: "100vh", paddingBottom: 60 }}>
++
++      {/* Header */}
++      <div style={{
++        background: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)",
++        borderBottom: "1px solid rgba(255,255,255,0.15)",
++        padding: "16px 32px", display: "flex", alignItems: "center", gap: 16,
++      }}>
++        <button onClick={() => navigate("/dashboard")}
++          style={{ background: "none", border: "none", color: "white", fontSize: 22, cursor: "pointer", padding: 0 }}>
++          ←
++        </button>
++        <h1 className="font-script" style={{ fontSize: 28, color: "white" }}>Sticker Pack Export 🏷️</h1>
++      </div>
++
++      <div style={{ maxWidth: 960, margin: "0 auto", padding: "36px 24px" }}>
++
++        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
++          <div>
++            <h2 className="font-playfair" style={{ fontSize: 26, color: "white", marginBottom: 6 }}>Pick memories to turn into stickers</h2>
++            <p className="font-dm" style={{ color: "rgba(255,255,255,0.65)", fontSize: 14 }}>
++              Photos become {STICKER_SIZE}×{STICKER_SIZE} sticker images. GIFs export as animated stickers.
++            </p>
++          </div>
++          <div style={{ display: "flex", gap: 8 }}>
++            <button className="btn-secondary" onClick={selectAll} style={{ fontSize: 13 }}>Select all</button>
++            <button className="btn-secondary" onClick={clearAll} style={{ fontSize: 13 }}>Clear</button>
++          </div>
++        </div>
++
++        {error && (
++          <div style={{ background: "#FEE2E2", border: "1px solid #F87171", borderRadius: 12, padding: "12px 16px", marginBottom: 24, color: "#B91C1C", fontSize: 14 }}>
++            {error}
++          </div>
++        )}
++
++        {loading && (
++          <p className="font-dm" style={{ color: "rgba(255,255,255,0.7)", fontSize: 15, textAlign: "center", padding: 60 }}>Loading your memories...</p>
++        )}
++
++        {!loading && captures.length === 0 && (
++          <div className="glass-card" style={{ textAlign: "center", padding: "60px 40px" }}>
++            <div style={{ fontSize: 56, marginBottom: 16 }}>🏷️</div>
++            <h3 className="font-playfair" style={{ fontSize: 22, color: "var(--text)", marginBottom: 8 }}>No memories yet!</h3>
++            <p className="font-dm" style={{ color: "var(--text-light)", marginBottom: 24, fontSize: 14 }}>
++              Take a photo or GIF first, then come back to build a sticker pack.
++            </p>
++            <button className="btn-primary" onClick={() => navigate("/photobooth")}>Open Photo Booth</button>
++          </div>
++        )}
++
++        {!loading && captures.length > 0 && (
++          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 18, marginBottom: 32 }}>
++            {captures.map((c) => {
++              const isSel = selected.has(c.id)
++              const animated = isAnimated(c)
++              return (
++                <div
++                  key={c.id}
++                  onClick={() => toggleSelect(c.id)}
++                  style={{
++                    position: "relative", cursor: "pointer",
++                    borderRadius: 16, overflow: "hidden",
++                    border: isSel ? "3px solid var(--pink)" : "3px solid transparent",
++                    boxShadow: "0 6px 20px rgba(0,0,0,0.18)",
++                    transition: "border-color 0.2s",
++                    background: "white",
++                  }}
++                >
++                  <div style={{ width: "100%", aspectRatio: "1", background: "var(--cream-dark)" }}>
++                    <AuthImage captureId={c.id} alt={c.caption || "memory"} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
++                  </div>
++                  <div style={{
++                    position: "absolute", top: 8, left: 8,
++                    width: 22, height: 22, borderRadius: "50%",
++                    background: isSel ? "var(--pink-dark)" : "rgba(255,255,255,0.85)",
++                    color: "white", display: "flex", alignItems: "center", justifyContent: "center",
++                    fontSize: 13, border: "1.5px solid rgba(255,255,255,0.9)",
++                  }}>
++                    {isSel ? "✓" : ""}
++                  </div>
++                  {animated && (
++                    <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(61,52,80,0.85)", color: "white", borderRadius: 999, padding: "3px 8px", fontSize: 10, letterSpacing: "0.06em" }}>
++                      GIF
++                    </div>
++                  )}
++                  <button
++                    onClick={(e) => { e.stopPropagation(); handleSingleDownload(c) }}
++                    title="Quick export this one"
++                    style={{
++                      position: "absolute", bottom: 8, right: 8,
++                      background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%",
++                      width: 26, height: 26, fontSize: 13, cursor: "pointer",
++                      display: "flex", alignItems: "center", justifyContent: "center",
++                      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
++                    }}
++                  >⬇</button>
++                </div>
++              )
++            })}
++          </div>
++        )}
++
++        {!loading && captures.length > 0 && (
++          <div className="glass-card" style={{ padding: 24, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
++            <div>
++              <p className="font-dm" style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>
++                {selected.size} selected
++              </p>
++              {exportMsg && (
++                <p className="font-dm" style={{ fontSize: 12, color: "var(--text-light)", marginTop: 2 }}>{exportMsg}</p>
++              )}
++            </div>
++
++            {exportedZipUrl ? (
++              <a
++                href={exportedZipUrl}
++                download={`sticker-pack-${Date.now()}.zip`}
++                className="btn-primary"
++                style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}
++              >
++                ⬇️ Download sticker-pack.zip
++              </a>
++            ) : (
++              <button
++                className="btn-primary"
++                onClick={handleExport}
++                disabled={selected.size === 0 || exporting}
++              >
++                {exporting ? "Exporting…" : `Export ${selected.size || ""} sticker${selected.size === 1 ? "" : "s"} 🏷️`}
++              </button>
++            )}
++          </div>
++        )}
++      </div>
++    </div>
++  )
++}
