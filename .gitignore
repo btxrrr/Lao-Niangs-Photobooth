@@ -24,3 +24,5 @@ backend/test.db
 # Environment variables
 .env
 .env.*
+!.env.example
+!backend/.env.example
