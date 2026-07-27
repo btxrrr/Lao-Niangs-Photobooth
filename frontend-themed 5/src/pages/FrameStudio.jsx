@@ -1,12 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { listCaptures, getCaptureImageUrl } from "../api/api"
+import { listCaptures, getCaptureImageUrl, convertVideoToMp4 } from "../api/api"
 import AuthImage from "../components/AuthImage"
 import TransformableLayer from "../components/TransformableLayer"
 import {
   CANVAS_PRESETS, BACKGROUND_PRESETS, FRAME_PRESETS, STICKER_CATEGORIES, STORY_LAYOUT_PRESETS,
   backgroundCss, drawBackgroundPreset, frameOverlayStyle,
 } from "../data/frameStudioAssets"
+import { isAnimatedGifSrc, decodeAnimatedGif, gifFrameAt } from "../utils/animatedGif"
 
 // ─────────────────────────────────────────────────────────────
 // Feature 5 — Smart Frame Studio
@@ -49,55 +50,52 @@ function fileToDataUrl(file) {
   })
 }
 
-const hiddenGifNodes = new WeakMap()
-
-function cleanupHiddenGifNode(img) {
-  const node = hiddenGifNodes.get(img)
-  if (node && node.parentNode) {
-    node.parentNode.removeChild(node)
-  }
-  hiddenGifNodes.delete(img)
-}
-
 function loadImageEl(src) {
-  const isGif = typeof src === "string" && (/\.gif($|\?)/i.test(src) || src.startsWith("data:image/gif"))
   return new Promise((resolve, reject) => {
     const img = new Image()
-    let node = null
-
-    if (isGif && typeof document !== "undefined") {
-      // For animated GIFs, position them where browser can render them for animation
-      node = document.createElement("div")
-      node.style.position = "absolute"
-      node.style.left = "-1px"
-      node.style.top = "-1px"
-      node.style.width = "1px"
-      node.style.height = "1px"
-      node.style.overflow = "hidden"
-      node.style.opacity = "1" // Must be visible for browser animation
-      node.style.pointerEvents = "none"
-      node.style.zIndex = "-9999"
-      img.style.width = "100%"
-      img.style.height = "100%"
-      img.style.display = "block"
-      node.appendChild(img)
-      document.body.appendChild(node)
-      hiddenGifNodes.set(img, node)
-    }
-
-    img.onload = () => {
-      // Mark as animated GIF for export logic
-      img._isAnimatedGif = isGif
-      resolve(img)
-    }
-    img.onerror = (err) => {
-      if (node && node.parentNode) {
-        node.parentNode.removeChild(node)
-      }
-      hiddenGifNodes.delete(img)
-      reject(err)
-    }
+    img.onload = () => resolve(img)
+    img.onerror = reject
     img.src = src
+  })
+}
+
+// A "media entry" is what gets stored in imgCache for each drawable
+// source: either a plain static image, or a decoded GIF (a list of
+// pre-rendered frame canvases + delays). `mediaFrameAt()` resolves an
+// entry down to the single Image/Canvas that should be painted for a
+// given elapsed time — every draw call in drawScene() goes through it
+// so GIFs actually animate in the exported video instead of showing
+// whatever frame the browser happened to be paused on.
+async function loadMediaEntry(src, isGif) {
+  if (isGif || isAnimatedGifSrc(src)) {
+    try {
+      return await decodeAnimatedGif(src)
+    } catch (err) {
+      console.warn("Falling back to static image — GIF decode failed:", err)
+    }
+  }
+  const img = await loadImageEl(src)
+  return { kind: "static", img }
+}
+
+function mediaFrameAt(entry, elapsedMs) {
+  if (!entry) return null
+  if (entry.kind === "gif") return gifFrameAt(entry, elapsedMs)
+  return entry.img
+}
+
+// Guards against the MP4 conversion hanging indefinitely (e.g. a slow
+// network fetching the ffmpeg engine, or a browser that just doesn't
+// cooperate with ffmpeg.wasm) — if it takes too long we bail out so the
+// export flow can fall back to the WebM it already has, instead of
+// leaving the user stuck on "Converting…" forever.
+function withTimeout(promise, ms, message) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms)
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value) },
+      (err) => { clearTimeout(timer); reject(err) }
+    )
   })
 }
 
@@ -321,14 +319,14 @@ export default function FrameStudio() {
 
       const imgCache = new Map()
       if (background.kind === "image") {
-        imgCache.set("background", await loadImageEl(background.value))
+        imgCache.set("background", await loadMediaEntry(background.value))
       }
       for (const l of layers) {
-        if (l.variant === "image") imgCache.set(l.id, await loadImageEl(l.src))
+        if (l.variant === "image") imgCache.set(l.id, await loadMediaEntry(l.src, l.isGif))
       }
       if (storyLayout) {
         for (const [index, slot] of storySlots.entries()) {
-          if (slot?.dataUrl) imgCache.set(`story-${index}`, await loadImageEl(slot.dataUrl))
+          if (slot?.dataUrl) imgCache.set(`story-${index}`, await loadMediaEntry(slot.dataUrl, slot.isGif))
         }
       }
 
@@ -337,25 +335,26 @@ export default function FrameStudio() {
         if (background.kind === "preset") {
           const preset = BACKGROUND_PRESETS.find((b) => b.id === background.value)
           drawBackgroundPreset(ctx, preset || BACKGROUND_PRESETS[0], w, h)
-        } else if (background.kind === "image" && imgCache.get("background")) {
-          coverDraw(ctx, imgCache.get("background"), w, h)
+        } else if (background.kind === "image") {
+          const bg = mediaFrameAt(imgCache.get("background"), elapsedMs)
+          if (bg) coverDraw(ctx, bg, w, h)
         }
 
         if (storyLayout) {
           const rects = getStorySlotRects(storyLayout, w, h)
           rects.forEach((rect, index) => {
             const slot = storySlots[index]
+            const img = slot?.dataUrl ? mediaFrameAt(imgCache.get(`story-${index}`), elapsedMs) : null
             ctx.save()
             ctx.beginPath()
             ctx.rect(rect.x, rect.y, rect.w, rect.h)
             ctx.clip()
-            
-            if (slot?.dataUrl && imgCache.get(`story-${index}`)) {
-              const img = imgCache.get(`story-${index}`)
+
+            if (img) {
               const iAspect = img.width / img.height
               const sAspect = rect.w / rect.h
               let sx, sy, sw, sh
-              
+
               if (iAspect > sAspect) {
                 sh = img.height
                 sw = sh * sAspect
@@ -367,7 +366,7 @@ export default function FrameStudio() {
                 sx = 0
                 sy = (img.height - sh) / 2
               }
-              
+
               ctx.drawImage(img, sx, sy, sw, sh, rect.x, rect.y, rect.w, rect.h)
             } else {
               ctx.fillStyle = "rgba(255,255,255,0.72)"
@@ -395,7 +394,7 @@ export default function FrameStudio() {
             ctx.textBaseline = "middle"
             ctx.fillText(l.emoji, 0, 0)
           } else {
-            const img = imgCache.get(l.id)
+            const img = mediaFrameAt(imgCache.get(l.id), elapsedMs)
             if (img) ctx.drawImage(img, -l.w / 2, -l.h / 2, l.w, l.h)
           }
           ctx.restore()
@@ -429,9 +428,10 @@ export default function FrameStudio() {
         const stopped = new Promise((resolve) => { mr.onstop = resolve })
         mr.start()
 
-        // Extended duration for better GIF animation visibility
-        // GIFs need multiple animation cycles to be visible
-        const DURATION_MS = 12000 // 12 seconds for multiple GIF loops
+        // GIF frames are now drawn deterministically (see animatedGif.js),
+        // so we no longer need a long recording just to get "lucky" and
+        // catch motion — a shorter clip means much faster MP4 encoding.
+        const DURATION_MS = 6000 // 6 seconds, plenty for a few GIF loops
         const start = performance.now()
         
         const loop = (now) => {
@@ -448,10 +448,28 @@ export default function FrameStudio() {
         requestAnimationFrame(loop)
         await stopped
 
-        // Create blob with WebM format
-        const blob = new Blob(chunks, { type: mimeType })
-        setMimeTypeUsed(mimeType)
-        setResultUrl(URL.createObjectURL(blob))
+        // MediaRecorder can only reliably produce WebM in the browser, so
+        // that's what we record — then the backend transcodes it to a real
+        // .mp4 with server-side ffmpeg. (In-browser WASM conversion was
+        // tried first but ffmpeg.wasm's worker fails to load in Safari, so
+        // conversion now happens server-side, which works the same in
+        // every browser.)
+        const webmBlob = new Blob(chunks, { type: mimeType })
+
+        try {
+          setExportMsg("Converting to MP4…")
+          const res = await withTimeout(
+            convertVideoToMp4(webmBlob),
+            60000,
+            "MP4 conversion timed out"
+          )
+          setMimeTypeUsed("video/mp4")
+          setResultUrl(URL.createObjectURL(res.data))
+        } catch (err) {
+          console.error("MP4 conversion failed, falling back to WebM:", err)
+          setMimeTypeUsed(mimeType)
+          setResultUrl(URL.createObjectURL(webmBlob))
+        }
         setResultKind("video")
       }
       setStep("export")
@@ -915,7 +933,7 @@ export default function FrameStudio() {
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
               <a
                 href={resultUrl}
-                download={`smart-frame-${Date.now()}.${resultKind === "video" ? "webm" : "png"}`}
+                download={`smart-frame-${Date.now()}.${resultKind === "video" ? (mimeTypeUsed?.includes("mp4") ? "mp4" : "webm") : "png"}`}
                 className="btn-primary"
                 style={{ textDecoration: "none" }}
               >

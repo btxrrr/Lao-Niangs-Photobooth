@@ -4,7 +4,7 @@ import Webcam from "react-webcam"
 import { useCapture } from "../api/useCapture"
 import { useGestureDetection } from "../api/useGestureDetection"
 import PoseLibraryModal from "../components/PoseLibraryModal"
-import PoseSilhouette from "../components/PoseSilhouette"
+import AuthImage from "../components/AuthImage"
 
 const WEBCAM_CONSTRAINTS = {
   width:  { ideal: 1280 },
@@ -79,6 +79,10 @@ export default function Photobooth() {
   const [gestureStatus, setGestureStatus] = useState(null)
 
   // ── Pose Assistant (Feature 6) ─────────────────────────────
+  // Every pose is a real reference photo (a bundled default or a
+  // custom upload) — no more drawn stick figures. It's shown in a
+  // side panel beside the webcam rather than overlaid on top of it,
+  // since a real photo layered over live video just reads as clutter.
   const [showPoseModal, setShowPoseModal] = useState(false)
   const [selectedPose,  setSelectedPose]  = useState(null)
 
@@ -165,58 +169,78 @@ export default function Photobooth() {
         <h1 className="font-script" style={{ fontSize: 28, color: "white" }}>Photo Booth 📸</h1>
       </div>
 
-      <div style={{ maxWidth: 700, margin: "40px auto", padding: "0 24px" }}>
+      <div style={{ maxWidth: phase === "preview" && selectedPose ? 980 : 700, margin: "40px auto", padding: "0 24px", transition: "max-width 0.2s" }}>
 
         {/* ══ PHASE: preview ══ */}
         {phase === "preview" && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
 
-            <div style={{ position: "relative", width: "100%", borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 40px rgba(0,0,0,0.3)" }}>
-              <Webcam
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-                videoConstraints={WEBCAM_CONSTRAINTS}
-                style={{ width: "100%", display: "block" }}
-                mirrored
-                onUserMedia={handleUserMedia}
-              />
+            <div style={{ display: "flex", gap: 20, width: "100%", justifyContent: "center", alignItems: "flex-start", flexWrap: "wrap" }}>
+              <div style={{
+                position: "relative", borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 40px rgba(0,0,0,0.3)",
+                flex: selectedPose ? "1 1 420px" : "1 1 100%",
+                maxWidth: selectedPose ? 560 : "100%",
+              }}>
+                <Webcam
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={WEBCAM_CONSTRAINTS}
+                  style={{ width: "100%", display: "block" }}
+                  mirrored
+                  onUserMedia={handleUserMedia}
+                />
 
-              {/* Pose overlay — purely a visual guide, not validated.
-                  Sized to the webcam's own aspect ratio (not a fixed
-                  70% box) so the silhouette actually lines up with
-                  where people stand across the real frame, whether
-                  it's a single pose or a wide group lineup. */}
-              {selectedPose && countdown === null && (
-                <div style={{ position: "absolute", inset: 0, pointerEvents: "none", display: "flex", alignItems: "flex-end", justifyContent: "center", padding: "0 2%" }}>
-                  <div style={{ width: "100%", maxHeight: "94%", aspectRatio: "16 / 9" }}>
-                    <PoseSilhouette pose={selectedPose} opacity={0.45} />
-                  </div>
-                </div>
-              )}
-
-              {/* Countdown overlay */}
-              {countdown !== null && (
-                <div style={{
-                  position: "absolute", inset: 0,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  background: "rgba(0,0,0,0.35)",
-                }}>
-                  <span style={{
-                    fontSize: 120, fontFamily: "Dancing Script, cursive",
-                    color: "white", textShadow: "0 4px 20px rgba(0,0,0,0.5)", lineHeight: 1,
+                {/* Countdown overlay */}
+                {countdown !== null && (
+                  <div style={{
+                    position: "absolute", inset: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: "rgba(0,0,0,0.35)",
                   }}>
-                    {countdown}
-                  </span>
+                    <span style={{
+                      fontSize: 120, fontFamily: "Dancing Script, cursive",
+                      color: "white", textShadow: "0 4px 20px rgba(0,0,0,0.5)", lineHeight: 1,
+                    }}>
+                      {countdown}
+                    </span>
+                  </div>
+                )}
+
+                {/* Hold ring */}
+                {gestureStatus?.type === "holding" && countdown === null && (
+                  <HoldRing progress={gestureStatus.progress} />
+                )}
+
+                {/* Status banner */}
+                {countdown === null && <StatusBanner status={gestureStatus} />}
+              </div>
+
+              {/* Reference panel — shown beside the webcam for real
+                  reference photos (custom uploads or bundled defaults),
+                  so users can glance over and copy the pose without a
+                  real photo cluttering the live feed. */}
+              {selectedPose && (
+                <div className="glass-card" style={{ flex: "0 0 260px", maxWidth: 260, padding: 14, alignSelf: "stretch" }}>
+                  <p className="font-dm" style={{ fontSize: 11.5, color: "var(--text-light)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 8 }}>
+                    Reference
+                  </p>
+                  {selectedPose.kind === "custom" ? (
+                    <AuthImage
+                      src={selectedPose.imageUrl}
+                      alt={selectedPose.label}
+                      style={{ width: "100%", borderRadius: 12, display: "block", marginBottom: 8 }}
+                    />
+                  ) : (
+                    <img
+                      src={selectedPose.src}
+                      alt={selectedPose.label}
+                      style={{ width: "100%", borderRadius: 12, display: "block", marginBottom: 8 }}
+                    />
+                  )}
+                  <p className="font-dm" style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{selectedPose.label}</p>
+                  <p className="font-dm" style={{ fontSize: 11.5, color: "var(--text-light)", marginTop: 2 }}>{selectedPose.tip}</p>
                 </div>
               )}
-
-              {/* Hold ring */}
-              {gestureStatus?.type === "holding" && countdown === null && (
-                <HoldRing progress={gestureStatus.progress} />
-              )}
-
-              {/* Status banner */}
-              {countdown === null && <StatusBanner status={gestureStatus} />}
             </div>
 
             {/* Pose Assistant controls */}

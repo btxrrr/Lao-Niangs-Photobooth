@@ -1,49 +1,123 @@
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"
+import { POSE_TYPES, getDefaultPoseImages } from "../data/poses"
+import AuthImage from "./AuthImage"
 import {
-  POSE_TYPES, getPosesByType, getRandomPose,
-  GROUP_SIZE_MIN, GROUP_SIZE_MAX, GROUP_SIZE_DEFAULT, clampGroupSize,
-} from "../data/poses"
-import PoseSilhouette from "./PoseSilhouette"
+  listPoseReferences, uploadPoseReference, deletePoseReference, getPoseReferenceImageUrl,
+} from "../api/api"
+
+// A custom pose reference from the backend, reshaped to the same shape
+// as a bundled default pose so both can drop into the same grid /
+// onSelect(pose) / Feeling Lucky flow.
+function poseRefToPose(ref) {
+  return {
+    id: `custom-${ref.id}`,
+    kind: "custom",
+    refId: ref.id,
+    type: ref.shot_type,
+    label: ref.name,
+    tip: "Your own reference photo",
+    imageUrl: getPoseReferenceImageUrl(ref.id),
+  }
+}
 
 // ─────────────────────────────────────────────────────────────
 // PoseLibraryModal — Feature 6: Pose Assistant
 //
 // Two interaction modes live here:
-//   • Pose Library Mode  — pick a shot type (for Group, also enter
-//                           how many people), browse filtered poses,
-//                           tap one to select it.
+//   • Pose Library Mode  — pick a shot type (Single / Duo / Trio /
+//                           Quad — a fixed headcount, not a stepper),
+//                           browse the reference photos for it, tap
+//                           one to select it.
 //   • Pose Roulette Mode — "Feeling Lucky" instantly picks a random
 //                           pose from the same filtered list.
 //
-// Poses are filtered (and, for Group, generated) according to the
-// selected shot type / group size, so a suggested pose always fits
-// the number of people actually in the shot.
+// Every pose is a real reference image — either bundled with the app
+// (data/poses.js DEFAULT_POSE_IMAGES) or uploaded by this account
+// (backend /poses API). There's no procedural stick-figure fallback.
 //
 // onSelect(pose | null) is called when the user confirms a pose or
 // explicitly skips ("No pose, thanks").
 // ─────────────────────────────────────────────────────────────
 export default function PoseLibraryModal({ onSelect, onClose }) {
   const [shotType, setShotType] = useState("single")
-  const [groupSize, setGroupSize] = useState(GROUP_SIZE_DEFAULT)
 
-  // Reset the group-size stepper to a sane default whenever the
-  // user leaves Group mode and comes back.
-  useEffect(() => {
-    if (shotType !== "group") setGroupSize(GROUP_SIZE_DEFAULT)
+  // Custom, user-uploaded pose references for the current shot type.
+  const [customPoses, setCustomPoses] = useState([])
+  const [customLoading, setCustomLoading] = useState(false)
+  const [showUpload, setShowUpload] = useState(false)
+  const [uploadName, setUploadName] = useState("")
+  const [uploadFile, setUploadFile] = useState(null)
+  const [uploadPreview, setUploadPreview] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState("")
+  const fileInputRef = useRef(null)
+
+  const loadCustomPoses = useCallback(async () => {
+    setCustomLoading(true)
+    try {
+      const res = await listPoseReferences(shotType)
+      setCustomPoses(res.data.map(poseRefToPose))
+    } catch {
+      setCustomPoses([])
+    } finally {
+      setCustomLoading(false)
+    }
   }, [shotType])
 
+  useEffect(() => {
+    loadCustomPoses()
+  }, [loadCustomPoses])
+
+  const defaultImagePoses = useMemo(() => getDefaultPoseImages(shotType), [shotType])
+
+  // Custom (per-account) poses first, then bundled defaults.
   const poses = useMemo(
-    () => getPosesByType(shotType, groupSize),
-    [shotType, groupSize]
+    () => [...customPoses, ...defaultImagePoses],
+    [customPoses, defaultImagePoses]
   )
 
-  const adjustGroupSize = (delta) => {
-    setGroupSize((n) => clampGroupSize(n + delta))
+  const handleLucky = () => {
+    if (poses.length === 0) return
+    const pose = poses[Math.floor(Math.random() * poses.length)]
+    onSelect(pose)
   }
 
-  const handleLucky = () => {
-    const pose = getRandomPose(shotType, groupSize)
-    if (pose) onSelect(pose)
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadFile(file)
+    setUploadPreview(URL.createObjectURL(file))
+    setUploadError("")
+  }
+
+  const handleUploadSave = async () => {
+    if (!uploadFile || !uploadName.trim()) return
+    setUploading(true)
+    setUploadError("")
+    try {
+      await uploadPoseReference(uploadFile, uploadName.trim(), shotType)
+      setShowUpload(false)
+      setUploadName("")
+      setUploadFile(null)
+      setUploadPreview(null)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+      await loadCustomPoses()
+    } catch (err) {
+      setUploadError(err.response?.data?.detail || "Could not save this pose. Please try again.")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleDeleteCustom = async (e, pose) => {
+    e.stopPropagation()
+    if (!window.confirm(`Remove "${pose.label}" from your pose library?`)) return
+    try {
+      await deletePoseReference(pose.refId)
+      setCustomPoses((prev) => prev.filter((p) => p.id !== pose.id))
+    } catch {
+      alert("Could not remove this pose. Please try again.")
+    }
   }
 
   return (
@@ -68,8 +142,8 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
           Pick a shot type, then browse poses or let us surprise you.
         </p>
 
-        {/* Shot type selector */}
-        <div style={{ display: "flex", gap: 8, marginBottom: shotType === "group" ? 16 : 20 }}>
+        {/* Shot type selector — fixed headcounts, no stepper */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
           {POSE_TYPES.map((t) => (
             <button
               key={t.id}
@@ -90,49 +164,101 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
           ))}
         </div>
 
-        {/* Group size stepper — only shown for Group shots */}
-        {shotType === "group" && (
-          <div style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 14,
-            marginBottom: 20, background: "var(--cream-dark)", borderRadius: 14, padding: "10px 16px",
-          }}>
-            <span className="font-dm" style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>
-              How many people?
-            </span>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <button
-                onClick={() => adjustGroupSize(-1)}
-                disabled={groupSize <= GROUP_SIZE_MIN}
-                style={stepperBtnStyle}
-              >−</button>
-              <span className="font-playfair" style={{ fontSize: 18, color: "var(--text)", minWidth: 22, textAlign: "center" }}>
-                {groupSize}
-              </span>
-              <button
-                onClick={() => adjustGroupSize(1)}
-                disabled={groupSize >= GROUP_SIZE_MAX}
-                style={stepperBtnStyle}
-              >+</button>
-            </div>
-          </div>
-        )}
-
         {/* Feeling Lucky */}
         <button
           className="btn-primary"
           onClick={handleLucky}
-          style={{ width: "100%", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+          disabled={poses.length === 0}
+          style={{ width: "100%", marginBottom: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
         >
           🎲 Feeling Lucky — surprise me
         </button>
 
+        {/* Upload your own pose */}
+        <div style={{ marginBottom: 20 }}>
+          {!showUpload ? (
+            <button
+              className="btn-secondary"
+              onClick={() => setShowUpload(true)}
+              style={{ width: "100%", fontSize: 13 }}
+            >
+              ⬆️ Upload your own pose reference
+            </button>
+          ) : (
+            <div style={{ background: "var(--cream-dark)", borderRadius: 14, padding: 14 }}>
+              <p className="font-dm" style={{ fontSize: 12.5, color: "var(--text)", fontWeight: 600, marginBottom: 10 }}>
+                Save a reference image for {POSE_TYPES.find((t) => t.id === shotType)?.label} shots
+              </p>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    width: 70, height: 70, borderRadius: 10, flexShrink: 0, cursor: "pointer",
+                    background: uploadPreview ? `url(${uploadPreview}) center/cover` : "white",
+                    border: "1.5px dashed rgba(244,167,185,0.5)",
+                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "var(--text-light)",
+                  }}
+                >
+                  {!uploadPreview && "🖼️"}
+                </div>
+                <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleFileChange} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <input
+                    type="text"
+                    className="input-field"
+                    placeholder="Name this pose (e.g. Anime peace sign)"
+                    value={uploadName}
+                    onChange={(e) => setUploadName(e.target.value)}
+                    maxLength={60}
+                    style={{ fontSize: 13, marginBottom: 8 }}
+                  />
+                  {uploadError && (
+                    <p className="font-dm" style={{ fontSize: 11.5, color: "#B91C1C", marginBottom: 8 }}>{uploadError}</p>
+                  )}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      className="btn-primary"
+                      onClick={handleUploadSave}
+                      disabled={!uploadFile || !uploadName.trim() || uploading}
+                      style={{ fontSize: 12.5, padding: "7px 16px" }}
+                    >
+                      {uploading ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => {
+                        setShowUpload(false); setUploadFile(null); setUploadPreview(null); setUploadName(""); setUploadError("")
+                        if (fileInputRef.current) fileInputRef.current.value = ""
+                      }}
+                      style={{ fontSize: 12.5, padding: "7px 16px" }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Pose grid */}
+        {customLoading && poses.length === 0 && (
+          <p className="font-dm" style={{ fontSize: 12.5, color: "var(--text-light)", textAlign: "center", padding: 12 }}>
+            Loading your poses…
+          </p>
+        )}
+        {!customLoading && poses.length === 0 && (
+          <p className="font-dm" style={{ fontSize: 12.5, color: "var(--text-light)", textAlign: "center", padding: 20 }}>
+            No poses here yet — upload one above to get started.
+          </p>
+        )}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 14 }}>
           {poses.map((pose) => (
             <button
               key={pose.id}
               onClick={() => onSelect(pose)}
               style={{
+                position: "relative",
                 background: "var(--denim)", borderRadius: 14, border: "2px solid transparent",
                 padding: 0, cursor: "pointer", overflow: "hidden", transition: "border-color 0.2s",
                 display: "flex", flexDirection: "column",
@@ -140,8 +266,27 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
               onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--pink)")}
               onMouseLeave={(e) => (e.currentTarget.style.borderColor = "transparent")}
             >
-              <div style={{ aspectRatio: "16 / 9", padding: 10 }}>
-                <PoseSilhouette pose={pose} opacity={0.95} />
+              {pose.kind === "custom" && (
+                <span
+                  onClick={(e) => handleDeleteCustom(e, pose)}
+                  title="Remove this pose"
+                  style={{
+                    position: "absolute", top: 6, right: 6, zIndex: 2,
+                    width: 20, height: 20, borderRadius: "50%",
+                    background: "rgba(61,52,80,0.8)", color: "white",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 11, lineHeight: 1,
+                  }}
+                >
+                  ✕
+                </span>
+              )}
+              <div style={{ aspectRatio: "16 / 9" }}>
+                {pose.kind === "custom" ? (
+                  <AuthImage src={pose.imageUrl} alt={pose.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                ) : (
+                  <img src={pose.src} alt={pose.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                )}
               </div>
               <div style={{ background: "white", padding: "8px 10px" }}>
                 <p className="font-dm" style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{pose.label}</p>
@@ -161,11 +306,4 @@ export default function PoseLibraryModal({ onSelect, onClose }) {
       </div>
     </div>
   )
-}
-
-const stepperBtnStyle = {
-  width: 28, height: 28, borderRadius: "50%",
-  border: "1.5px solid var(--pink-dark)", background: "white", color: "var(--pink-dark)",
-  fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-  lineHeight: 1,
 }
