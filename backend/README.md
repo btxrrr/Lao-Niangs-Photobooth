@@ -67,6 +67,14 @@ Deployment notes:
 - Configure real values in your host's environment variable dashboard.
 - On Render, pin Python to 3.12.11 using backend/runtime.txt so av and pillow install from wheels instead of building from source.
 
+Render deployment for full media features (GIF/MP4/stickers):
+
+- Use a Docker Web Service, not the default Python runtime.
+- Set Root Directory to backend.
+- Render will build from backend/Dockerfile, which installs FFmpeg libs needed by av.
+- Do not set Build Command or Start Command manually in Docker mode.
+- Keep your environment variables configured in Render dashboard.
+
 ## Endpoint Summary
 
 Auth:
