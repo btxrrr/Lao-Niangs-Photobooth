@@ -8,7 +8,7 @@ import axios from "axios"
 // changes (e.g. when you deploy), you only change it in ONE place.
 // ─────────────────────────────────────────────────────────────
 
-export const BASE_URL = "http://localhost:8000"
+export const BASE_URL = "https://lao-niangs-photobooth-eiik.onrender.com"
 
 // Create an axios instance pointed at your backend
 const api = axios.create({
